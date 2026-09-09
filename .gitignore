@@ -29,6 +29,7 @@
 **/dist/
 **/coverage/
 **/test-results/
+test/failures/
 *.log
 *.iml
 *.apk

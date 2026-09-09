@@ -27,3 +27,5 @@ Use your own Worker project name in `wrangler.toml`. Set Supabase settings throu
 Health endpoints are `/health` and `/version`; application APIs are under `/v1`. SQL changes are in `../supabase/migrations`. They extend a pre-existing schema: inspect dependencies before bootstrapping a new database.
 
 The multiplayer implementation is still evolving. Local tests do not establish complete production readiness or validate every multi-device workflow. Runtime-test entry points that bypass authentication must never be deployed.
+
+An optional Supabase HTTP/WebSocket gateway is included at `../supabase/functions/game-server-proxy/index.ts`. Set its `GAME_SERVER_UPSTREAM_URL` environment variable to your own HTTPS Worker origin before deployment. Gateway configuration must preserve the backend's authentication requirements.
