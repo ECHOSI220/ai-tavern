@@ -1,0 +1,25 @@
+{
+  "name": "ai-tavern-production-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:runtime": "node test/runtime-smoke.mjs",
+    "test:watch": "vitest",
+    "deploy": "wrangler deploy",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "jose": "6.2.10",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260903.1",
+    "typescript": "7.0.2",
+    "vitest": "4.1.11",
+    "wrangler": "4.128.0"
+  }
+}

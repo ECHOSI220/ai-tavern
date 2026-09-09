@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "themeId": "knight_oath_mooncourt",
+  "name": "誓约之剑 · 王之庭院",
+  "category": "character_theme",
+  "provenance": {
+    "created": "2026-09-01",
+    "images": "Built-in imagegen: original environments and Saber fan-art, style-refreshed 2026-09-02 from user-provided illustration references. Not official artwork.",
+    "character": "exec-b7b130e8-a438-443d-93ac-a9b38fdc44ee.png",
+    "bg_main": "exec-d42e03a5-dd40-4e1d-b2e7-42fedb3f2a2b.png",
+    "bg_chat": "exec-81fe706f-e14e-41af-ae8d-1a25a47d7da8.png",
+    "immersive_wide": "exec-0f6bd99d-c90c-445f-85bc-8d4619faf9a2.png",
+    "immersive_mobile": "exec-0d1ef0ba-b001-438c-a399-95f1f5b3c178.png"
+  },
+  "assets": {
+    "bg_main": {
+      "purpose": "横屏一体化 Saber 角色皮肤背景",
+      "size": "1672x941",
+      "renderer": "raster",
+      "path": "assets/themes/knight_oath_mooncourt/bg_saber_wide.png",
+      "implementation": "ThemeBackground immersive wallpaper",
+      "prompt": "prompts/immersive_wide.md"
+    },
+    "bg_chat": {
+      "purpose": "固定阅读视口的角色背景（代码叠加阅读遮罩）",
+      "size": "1672x941",
+      "renderer": "raster",
+      "path": "assets/themes/knight_oath_mooncourt/bg_saber_wide.png",
+      "implementation": "ThemeBackground immersive wallpaper",
+      "prompt": "prompts/immersive_wide.md"
+    },
+    "preview": {
+      "purpose": "一体化角色壁纸预览，无独立人物展示卡",
+      "size": "948x1659",
+      "renderer": "raster",
+      "path": "assets/themes/knight_oath_mooncourt/bg_saber_mobile.png",
+      "implementation": "SkinIllustratedHeader",
+      "prompt": "prompts/immersive_mobile.md"
+    },
+    "panel_texture": {
+      "purpose": "深蓝玻璃面板",
+      "size": "512x512",
+      "renderer": "native",
+      "replacementHint": "Optional raster reference; current production implementation is resolution-independent native drawing.",
+      "implementation": "CraftedSurface gradient",
+      "prompt": "prompts/panel_texture.md"
+    },
+    "border_gold": {
+      "purpose": "金色卡片/弹窗边框",
+      "size": "1024x1024",
+      "renderer": "native",
+      "replacementHint": "Optional raster reference; current production implementation is resolution-independent native drawing.",
+      "implementation": "CraftFrameBorder.oath",
+      "prompt": "prompts/border_gold.md"
+    },
+    "overlay_frame": {
+      "purpose": "外框装饰",
+      "size": "1024x1024",
+      "renderer": "native",
+      "replacementHint": "Optional raster reference; current production implementation is resolution-independent native drawing.",
+      "implementation": "CraftFrameBorder.oath",
+      "prompt": "prompts/overlay_frame.md"
+    },
+    "button_primary": {
+      "purpose": "主按钮及状态",
+      "size": "768x160",
+      "renderer": "native",
+      "replacementHint": "Optional raster reference; current production implementation is resolution-independent native drawing.",
+      "implementation": "SkinThemeBuilder FilledButtonTheme",
+      "prompt": "prompts/button_primary.md"
+    },
+    "button_secondary": {
+      "purpose": "次按钮及状态",
+      "size": "768x160",
+      "renderer": "native",
+      "replacementHint": "Optional raster reference; current production implementation is resolution-independent native drawing.",
+      "implementation": "SkinThemeBuilder OutlinedButtonTheme",
+      "prompt": "prompts/button_secondary.md"
+    },
+    "input_frame": {
+      "purpose": "输入框与焦点底线",
+      "size": "1024x192",
+      "renderer": "native",
+      "replacementHint": "Optional raster reference; current production implementation is resolution-independent native drawing.",
+      "implementation": "OathInputBorder / InputDecorationTheme",
+      "prompt": "prompts/input_frame.md"
+    },
+    "card_character": {
+      "purpose": "角色/从者卡边框",
+      "size": "768x1024",
+      "renderer": "native",
+      "replacementHint": "Optional raster reference; current production implementation is resolution-independent native drawing.",
+      "implementation": "CardTheme / CraftFrameBorder.oath",
+      "prompt": "prompts/card_character.md"
+    },
+    "card_system": {
+      "purpose": "系统与任务卡",
+      "size": "1024x512",
+      "renderer": "native",
+      "replacementHint": "Optional raster reference; current production implementation is resolution-independent native drawing.",
+      "implementation": "TrpgMessageBubble.system / ThemedPanel",
+      "prompt": "prompts/card_system.md"
+    },
+    "dice_bg": {
+      "purpose": "检定卡背景",
+      "size": "512x512",
+      "renderer": "native",
+      "replacementHint": "Optional raster reference; current production implementation is resolution-independent native drawing.",
+      "implementation": "ThemedDiceCard / OathCirclePainter",
+      "prompt": "prompts/dice_bg.md"
+    },
+    "dice_glow": {
+      "purpose": "成功/失败反馈",
+      "size": "512x512",
+      "renderer": "native",
+      "replacementHint": "Optional raster reference; current production implementation is resolution-independent native drawing.",
+      "implementation": "ThemedDiceCard critical/failure",
+      "prompt": "prompts/dice_glow.md"
+    },
+    "loading_magic_circle": {
+      "purpose": "加载魔法阵",
+      "size": "256x256",
+      "renderer": "native",
+      "replacementHint": "Optional raster reference; current production implementation is resolution-independent native drawing.",
+      "implementation": "ThemedLoadingIndicator / OathSigil",
+      "prompt": "prompts/loading_magic_circle.md"
+    },
+    "transition_glow": {
+      "purpose": "轻量页面淡入转场",
+      "size": "1024x1024",
+      "renderer": "native",
+      "replacementHint": "Optional raster reference; current production implementation is resolution-independent native drawing.",
+      "implementation": "OathPageTransitionsBuilder",
+      "prompt": "prompts/transition_glow.md"
+    },
+    "icon_set": {
+      "purpose": "剑盾冠书卷轴齿轮杯星纹参考",
+      "size": "1024x1024",
+      "renderer": "native",
+      "replacementHint": "Optional raster reference; current production implementation is resolution-independent native drawing.",
+      "implementation": "SkinIcon / OathIconPainter: 14 original semantic heraldry glyphs; CraftEmblem.oath",
+      "prompt": "prompts/icon_set.md"
+    },
+    "bg_portrait": {
+      "path": "assets/themes/knight_oath_mooncourt/bg_saber_mobile.png",
+      "size": "948x1659",
+      "purpose": "窄屏独立构图的全页背景",
+      "renderer": "raster",
+      "implementation": "skinBackgroundImage viewport-aware composition",
+      "prompt": "prompts/immersive_mobile.md"
+    }
+  }
+}

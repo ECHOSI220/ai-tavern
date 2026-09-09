@@ -1,0 +1,9 @@
+{
+  "version": "2026.9.9",
+  "publishedAt": "2026-09-09",
+  "notes": "新增角色卡、剧情模板快捷上传；Windows 支持 Ctrl+Shift+U；联机房间可复制网页邀请，仅同步公开房间状态。Windows 与安卓安装包统一存放在百度网盘。",
+  "downloads": [
+    {"platform":"Windows","architecture":"x64","format":"ZIP","url":"https://pan.baidu.com/s/5n9-eCMF9UetptIJTwEpn9w","size":56990290,"sha256":"3647f75748ec821dd2c729298a25cefc9905fabd00fa42016a821fd084372ec5","instructions":"百度网盘内选择 Windows ZIP；下载后完整解压，运行 ai_tavern.exe。不要只复制 exe。"},
+    {"platform":"Android","architecture":"arm64-v8a","format":"APK","url":"https://pan.baidu.com/s/5n9-eCMF9UetptIJTwEpn9w","size":85319621,"sha256":"be1831ea735211478e70b17d683e77ea9d0501e3ba3e5bfedebb0d8591349623","instructions":"百度网盘内选择 Android APK；适用于 64 位安卓手机，覆盖安装前建议备份本地存档。"}
+  ]
+}

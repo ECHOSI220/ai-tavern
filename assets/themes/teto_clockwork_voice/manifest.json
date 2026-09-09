@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "themeId": "teto_clockwork_voice",
+  "name": "重音发条 · Teto 合成工房",
+  "category": "character_theme",
+  "provenance": {
+    "created": "2026-09-01",
+    "updated": "2026-09-03",
+    "prototype": "ChatGPT Image 2026年9月2日 20_14_19 (3).png",
+    "images": "Built-in imagegen fan-art backgrounds regenerated from the user-approved Teto prototype with pale gray-white and rose geometry plus character cast shadows; not official artwork.",
+    "bg_main": "exec-6dc14189-26e3-427a-8f4f-481207dcaa41.png",
+    "bg_portrait": "exec-c9c1cf1b-986e-4001-8bef-5d9f2d1a27a1.png"
+  },
+  "assets": {
+    "bg_main": {
+      "path": "assets/themes/teto_clockwork_voice/bg_teto_wide.png",
+      "size": "1672x941",
+      "purpose": "横屏沉浸式 Teto 合成工房背景",
+      "renderer": "raster",
+      "prompt": "prompts/teto_wide.md"
+    },
+    "bg_chat": {
+      "path": "assets/themes/teto_clockwork_voice/bg_teto_wide.png",
+      "size": "1672x941",
+      "purpose": "聊天页共享合成工房背景",
+      "renderer": "raster",
+      "prompt": "prompts/teto_wide.md"
+    },
+    "bg_portrait": {
+      "path": "assets/themes/teto_clockwork_voice/bg_teto_mobile.png",
+      "size": "941x1672",
+      "purpose": "沿用横版人物画风与投影的手机竖屏构图",
+      "renderer": "raster",
+      "prompt": "prompts/teto_mobile.md"
+    },
+    "preview": {
+      "path": "assets/themes/teto_clockwork_voice/bg_teto_mobile.png",
+      "size": "941x1672",
+      "purpose": "皮肤库角色预览",
+      "renderer": "raster"
+    },
+    "panel_texture": { "purpose": "红黑合成器表面", "renderer": "native" },
+    "border_gold": { "purpose": "奶油仪表刻度边框", "renderer": "native" },
+    "button_primary": { "purpose": "红色录音按钮", "renderer": "native" },
+    "button_secondary": { "purpose": "深色旋钮按钮", "renderer": "native" },
+    "input_frame": { "purpose": "VU 表输入框", "renderer": "native" },
+    "card_character": { "purpose": "合成工房角色卡", "renderer": "native" },
+    "card_system": { "purpose": "合成工房系统卡", "renderer": "native" },
+    "dice_bg": { "purpose": "机械骰子底盘", "renderer": "native" },
+    "dice_glow": { "purpose": "红色节拍光效", "renderer": "native" },
+    "loading_magic_circle": { "purpose": "发条加载环", "renderer": "native" },
+    "transition_glow": { "purpose": "红色页面过渡光", "renderer": "native" },
+    "icon_set": { "purpose": "清晰的主题色线性图标", "renderer": "native" },
+    "clockwork_voice_ui": {
+      "purpose": "VU 表、旋钮铆钉、奶油刻度与红黑机械声场；图标保持清晰的标准线性轮廓",
+      "renderer": "native",
+      "implementation": "SkinMaterial.clockworkVoice / VocalSkinMotionPainter"
+    }
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "room": {
+    "roomId": "d921d016-a62f-4664-b8cb-bf6fbd3ed5d0",
+    "roomCode": "ABC234",
+    "roomName": "三人运行时验收",
+    "ownerPlayerId": "ce3e8fe3-dd03-4214-8302-78e21ede639e",
+    "ownerUserId": "owner",
+    "campaignId": "test",
+    "ruleSystemId": "simple_trpg",
+    "maxPlayers": 3,
+    "status": "playing",
+    "createdAt": "2026-09-08T17:24:53.540Z",
+    "updatedAt": "2026-09-08T17:24:59.100Z",
+    "players": [
+      {
+        "playerId": "ce3e8fe3-dd03-4214-8302-78e21ede639e",
+        "displayName": "房主",
+        "role": "roomOwner",
+        "characterId": "d54eafa8-14a9-4f51-87c7-d357b9f59996",
+        "connectionStatus": "online",
+        "isReady": true,
+        "joinedAt": "2026-09-08T17:24:53.540Z"
+      },
+      {
+        "playerId": "9cf314dd-92ce-4a86-9f50-2491fe37fb76",
+        "displayName": "second",
+        "role": "player",
+        "characterId": "5ca498f1-441b-438c-888d-5388a0120806",
+        "connectionStatus": "online",
+        "isReady": true,
+        "joinedAt": "2026-09-08T17:24:53.622Z"
+      },
+      {
+        "playerId": "ac09ca67-a248-4bda-9ef0-09776ad69bb8",
+        "displayName": "third",
+        "role": "player",
+        "characterId": "5a344cc2-1645-4831-8c9e-a976bdfefca8",
+        "connectionStatus": "online",
+        "isReady": true,
+        "joinedAt": "2026-09-08T17:24:53.631Z"
+      }
+    ],
+    "sessionId": "4be288b4-0b74-4ea2-835d-0de4a6296a65",
+    "revision": 26,
+    "sequenceNumber": 33,
+    "gmMode": "selectedPlayer",
+    "gmWaiting": false,
+    "aiHostConfig": {
+      "mode": "selectedPlayer",
+      "providerPlayerId": "9cf314dd-92ce-4a86-9f50-2491fe37fb76",
+      "providerType": "",
+      "modelId": "test-tool-provider",
+      "status": "ready",
+      "lastHeartbeat": "2026-09-08T17:24:53.745Z"
+    },
+    "aiProviderPlayerId": "9cf314dd-92ce-4a86-9f50-2491fe37fb76",
+    "allowJoinInProgress": false,
+    "kind": "temporary",
+    "currentTurn": {
+      "turnId": "75399576-a78c-418c-b592-c3cbe5a34070",
+      "roundNumber": 2,
+      "phase": "collecting",
+      "status": "active",
+      "mode": "freeformGroup",
+      "startedAt": "2026-09-08T17:24:58.869Z",
+      "playerActions": {},
+      "confirmedPlayerIds": [],
+      "expectedPlayerIds": [
+        "ce3e8fe3-dd03-4214-8302-78e21ede639e",
+        "9cf314dd-92ce-4a86-9f50-2491fe37fb76",
+        "ac09ca67-a248-4bda-9ef0-09776ad69bb8"
+      ]
+    }
+  },
+  "session": {
+    "schemaVersion": 11,
+    "id": "4be288b4-0b74-4ea2-835d-0de4a6296a65",
+    "title": "三人运行时验收",
+    "mode": "multiplayer",
+    "createdAt": "2026-09-08T17:24:53.540Z",
+    "updatedAt": "2026-09-08T17:24:59.100Z",
+    "status": "active",
+    "campaignId": "test",
+    "ruleSystemId": "simple_trpg",
+    "roomOwnerPlayerId": "ce3e8fe3-dd03-4214-8302-78e21ede639e",
+    "players": [
+      {
+        "playerId": "ce3e8fe3-dd03-4214-8302-78e21ede639e",
+        "displayName": "房主",
+        "role": "roomOwner",
+        "characterId": "d54eafa8-14a9-4f51-87c7-d357b9f59996",
+        "connectionStatus": "online",
+        "isReady": true,
+        "joinedAt": "2026-09-08T17:24:53.540Z"
+      },
+      {
+        "playerId": "9cf314dd-92ce-4a86-9f50-2491fe37fb76",
+        "displayName": "second",
+        "role": "player",
+        "characterId": "5ca498f1-441b-438c-888d-5388a0120806",
+        "connectionStatus": "online",
+        "isReady": true,
+        "joinedAt": "2026-09-08T17:24:53.622Z"
+      },
+      {
+        "playerId": "ac09ca67-a248-4bda-9ef0-09776ad69bb8",
+        "displayName": "third",
+        "role": "player",
+        "characterId": "5a344cc2-1645-4831-8c9e-a976bdfefca8",
+        "connectionStatus": "online",
+        "isReady": true,
+        "joinedAt": "2026-09-08T17:24:53.631Z"
+      }
+    ],
+    "playerCharacters": [
+      {
+        "id": "5a344cc2-1645-4831-8c9e-a976bdfefca8",
+        "playerId": "ac09ca67-a248-4bda-9ef0-09776ad69bb8",
+        "name": "调查员",
+        "description": "",
+        "background": "",
+        "stats": {
+          "STR": 10,
+          "DEX": 10,
+          "INT": 10,
+          "PER": 10,
+          "CHA": 10
+        },
+        "skills": {},
+        "hp": 20,
+        "maxHp": 20,
+        "inventory": [],
+        "metadata": {}
+      }
+    ],
+    "characterLocations": {},
+    "aiHostConfig": {
+      "mode": "selectedPlayer",
+      "providerPlayerId": "9cf314dd-92ce-4a86-9f50-2491fe37fb76",
+      "providerType": "",
+      "modelId": "test-tool-provider",
+      "status": "ready",
+      "lastHeartbeat": "2026-09-08T17:24:53.745Z"
+    },
+    "chatHistory": [
+      {
+        "id": "0847d935-297b-4377-9f8f-ea171d7c6d28",
+        "messageType": "gmMessage",
+        "content": "旧旅店的钟在午夜敲响。你们是受邀前来的调查员。",
+        "createdAt": "2026-09-08T17:24:53.755Z"
+      },
+      {
+        "id": "2f385287-ffd6-4d0c-b797-ea267f73e0a8",
+        "messageType": "gmMessage",
+        "content": "你们来到大厅，门后响起脚步声。",
+        "createdAt": "2026-09-08T17:24:58.869Z"
+      },
+      {
+        "id": "963bc5f7-330b-4e32-9424-8a5f880bfc70",
+        "messageType": "playerMessage",
+        "content": "重连后继续",
+        "playerId": "ce3e8fe3-dd03-4214-8302-78e21ede639e",
+        "createdAt": "2026-09-08T17:24:59.063Z"
+      },
+      {
+        "id": "1bba61d5-8498-458c-9dab-dd415b54a4f1",
+        "messageType": "playerMessage",
+        "content": "第三位仍在房间",
+        "playerId": "ac09ca67-a248-4bda-9ef0-09776ad69bb8",
+        "createdAt": "2026-09-08T17:24:59.100Z"
+      }
+    ],
+    "currentScene": "",
+    "immersionState": {
+      "allowPlayerPrivateChat": true,
+      "privateMessages": []
+    },
+    "worldState": {}
+  }
+}

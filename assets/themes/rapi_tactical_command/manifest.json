@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "themeId": "rapi_tactical_command",
+  "name": "反击战线 · 拉毗指挥室",
+  "category": "character_theme",
+  "provenance": {
+    "created": "2026-09-01",
+    "images": "Built-in imagegen fan-art backgrounds, style-refreshed 2026-09-02 from user-provided illustration references; not official game artwork.",
+    "reference": "Official regional NIKKE Rapi character image used only as a generation reference.",
+    "bg_main": "exec-dd12394e-26b5-4841-a6f0-dfbaae604604.png",
+    "bg_portrait": "exec-badfff2c-0fb3-4eb1-8fd5-8b78f8e1af7b.png"
+  },
+  "assets": {
+    "bg_main": {
+      "path": "assets/themes/rapi_tactical_command/bg_rapi_wide.png",
+      "size": "1672x941",
+      "purpose": "横屏沉浸式拉毗战术指挥室背景",
+      "renderer": "raster",
+      "prompt": "prompts/rapi_wide.md"
+    },
+    "bg_chat": {
+      "path": "assets/themes/rapi_tactical_command/bg_rapi_wide.png",
+      "size": "1672x941",
+      "purpose": "聊天页共享完整背景切片",
+      "renderer": "raster",
+      "prompt": "prompts/rapi_wide.md"
+    },
+    "bg_portrait": {
+      "path": "assets/themes/rapi_tactical_command/bg_rapi_mobile.png",
+      "size": "941x1672",
+      "purpose": "手机竖屏独立构图",
+      "renderer": "raster",
+      "prompt": "prompts/rapi_mobile.md"
+    },
+    "tactical_hud": {
+      "purpose": "扫描线、瞄准环、状态短线和角标",
+      "renderer": "native",
+      "implementation": "RapiTacticalPainter"
+    },
+    "panel_and_buttons": {
+      "purpose": "深灰装甲面板与红色切角交互件",
+      "renderer": "native",
+      "implementation": "SkinMaterial.neon / CraftFrameBorder"
+    }
+  }
+}

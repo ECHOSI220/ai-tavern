@@ -1,0 +1,293 @@
+import '../../models/rule_reference.dart';
+
+abstract final class RuleCompendium {
+  static const entries = <RuleReferenceEntry>[
+    RuleReferenceEntry(
+      id: 'dnd-core-check',
+      system: RuleReferenceSystem.dnd5e,
+      category: '核心检定',
+      title: 'D20 检定与难度',
+      summary: '投掷 D20，加上相关属性调整值和可能的熟练加值，与目标难度比较。',
+      points: [
+        '属性调整值通常为（属性值－10）÷2，向下取整。',
+        '角色只有在擅长相关技能、豁免或武器时才加入熟练加值。',
+        '总值达到或超过难度等级 DC 即成功；对抗时与另一方结果比较。',
+        '不要为必然成功、必然失败或没有代价的行为投骰。',
+      ],
+      example: '撬开一扇生锈铁门：D20＋力量调整值＋运动熟练，对抗 GM 给出的 DC。',
+      keywords: ['检定', 'DC', '属性', '技能', '豁免', '熟练'],
+    ),
+    RuleReferenceEntry(
+      id: 'dnd-advantage',
+      system: RuleReferenceSystem.dnd5e,
+      category: '核心检定',
+      title: '优势与劣势',
+      summary: '有优势或劣势时投两个 D20，分别取较高或较低的结果。',
+      points: [
+        '多项优势不会继续增加骰子，多项劣势同理。',
+        '只要优势和劣势同时存在，无论数量多少都相互抵消。',
+        '先决定是否具有优势或劣势，再处理重掷等效果。',
+      ],
+      example: '从阴影中偷袭可能获得优势；在浓雾中远程攻击可能承受劣势。',
+      keywords: ['优势', '劣势', '双骰', 'advantage', 'disadvantage'],
+    ),
+    RuleReferenceEntry(
+      id: 'dnd-character',
+      system: RuleReferenceSystem.dnd5e,
+      category: '角色创建',
+      title: '五分钟建卡顺序',
+      summary: '先明确人物概念，再选择种族、职业、背景和属性，最后补齐装备与法术。',
+      points: [
+        '用一句话写清角色是谁、为什么冒险以及最看重什么。',
+        '选择职业和背景，记录熟练项、生命值、护甲等级及职业资源。',
+        '分配力量、敏捷、体质、智力、感知、魅力，并计算调整值。',
+        '记录一项羁绊、一项弱点和一个短期目标，方便 AI GM 主动制造钩子。',
+      ],
+      keywords: ['建卡', '职业', '背景', '属性', '角色创建'],
+    ),
+    RuleReferenceEntry(
+      id: 'dnd-turn',
+      system: RuleReferenceSystem.dnd5e,
+      category: '战斗',
+      title: '战斗轮与行动经济',
+      summary: '每回合通常拥有移动、一个动作，以及条件允许时的附赠动作和一次反应。',
+      points: [
+        '常见动作包括攻击、施法、冲刺、撤离、闪避、协助、躲藏和准备。',
+        '移动可在动作前后拆分使用，但总距离不能超过速度。',
+        '反应通常每轮一次，在触发条件满足时使用。',
+        '脱离敌人威胁范围可能触发借机攻击，使用撤离动作可避免。',
+      ],
+      example: '移动到掩体后射击是“移动＋攻击动作”；除非能力说明，否则不能再施放附赠动作法术。',
+      keywords: ['战斗', '回合', '动作', '反应', '附赠动作', '借机攻击'],
+    ),
+    RuleReferenceEntry(
+      id: 'dnd-damage',
+      system: RuleReferenceSystem.dnd5e,
+      category: '战斗',
+      title: '伤害、倒地与死亡豁免',
+      summary: '生命降到 0 时通常陷入昏迷，并在自己的回合进行死亡豁免。',
+      points: [
+        '死亡豁免投 D20：10或更高记一次成功，否则记一次失败。',
+        '累计三次成功后伤势稳定；累计三次失败则死亡。',
+        '自然20通常恢复1点生命；自然1通常记两次失败。',
+        '受到足以造成巨量伤害的攻击时，可能直接死亡。',
+      ],
+      keywords: ['死亡豁免', '倒地', '生命', '治疗', '稳定'],
+    ),
+    RuleReferenceEntry(
+      id: 'dnd-spell',
+      system: RuleReferenceSystem.dnd5e,
+      category: '法术',
+      title: '施法、专注与法术位',
+      summary: '法术说明决定施法时间、距离、成分、持续时间和是否需要专注。',
+      points: [
+        '同一角色通常只能同时维持一个专注法术。',
+        '专注期间受到伤害时进行体质豁免，DC通常为10或伤害的一半，取较高者。',
+        '法术攻击使用 D20＋施法属性调整值＋熟练加值。',
+        '法术豁免 DC 通常为8＋熟练加值＋施法属性调整值。',
+      ],
+      keywords: ['法术', '专注', '法术位', '施法', '体质豁免'],
+    ),
+    RuleReferenceEntry(
+      id: 'dnd-rest',
+      system: RuleReferenceSystem.dnd5e,
+      category: '冒险',
+      title: '短休、长休与资源节奏',
+      summary: '休息决定生命、法术和职业能力的恢复，GM应让时间与危险产生真实代价。',
+      points: [
+        '短休允许角色花费生命骰恢复生命，并恢复部分职业资源。',
+        '长休通常恢复全部生命和部分生命骰，并恢复多数每日资源。',
+        '在危险地点休息可能遭遇巡逻、时间推进或任务后果。',
+      ],
+      keywords: ['短休', '长休', '资源', '生命骰', '冒险日'],
+    ),
+    RuleReferenceEntry(
+      id: 'coc-core-check',
+      system: RuleReferenceSystem.coc7,
+      category: '核心检定',
+      title: 'D100 技能检定',
+      summary: '投掷百分骰，结果不高于技能值即为成功；数值越低，成功程度越高。',
+      points: [
+        '普通成功：结果不高于技能值。',
+        '困难成功：结果不高于技能值的一半。',
+        '极难成功：结果不高于技能值的五分之一。',
+        '只有失败会推动危险、失去机会或付出代价时才需要检定。',
+      ],
+      example: '侦查60：投出43为普通成功，28为困难成功，11为极难成功。',
+      keywords: ['百分骰', 'D100', '普通成功', '困难成功', '极难成功'],
+    ),
+    RuleReferenceEntry(
+      id: 'coc-bonus',
+      system: RuleReferenceSystem.coc7,
+      category: '核心检定',
+      title: '奖励骰与惩罚骰',
+      summary: '额外投掷十位骰；奖励骰取更有利的十位，惩罚骰取更不利的十位。',
+      points: [
+        '个位骰保持不变，只比较多个十位骰组成的结果。',
+        '奖励骰和惩罚骰可以相互抵消。',
+        '00与0通常代表100，具体按百分骰读法处理。',
+      ],
+      example: '个位是7，两个十位分别为2和6：奖励骰结果为27，惩罚骰结果为67。',
+      keywords: ['奖励骰', '惩罚骰', '十位骰', '百分骰'],
+    ),
+    RuleReferenceEntry(
+      id: 'coc-character',
+      system: RuleReferenceSystem.coc7,
+      category: '角色创建',
+      title: '调查员快速建卡',
+      summary: '先确定时代、职业和个人信念，再生成属性、派生数值与职业技能。',
+      points: [
+        '写清调查员的职业、人际关系、重要地点、珍视物品与性格特征。',
+        '分配职业技能点后，再用兴趣技能补足个人经历。',
+        '计算生命、理智、魔法、幸运、移动和伤害加值等派生数值。',
+        '给调查员一个愿意冒险的理由，同时保留会让其退缩的底线。',
+      ],
+      keywords: ['调查员', '建卡', '职业', '兴趣技能', '背景'],
+    ),
+    RuleReferenceEntry(
+      id: 'coc-push-luck',
+      system: RuleReferenceSystem.coc7,
+      category: '调查',
+      title: '孤注一掷与幸运',
+      summary: '失败后可通过更冒险的做法孤注一掷；再次失败必须承受明确且更严重的后果。',
+      points: [
+        '孤注一掷前，主持人应先说明可能发生的最坏结果。',
+        '战斗和理智检定通常不能孤注一掷。',
+        '允许消耗幸运调整结果时，每减少1点骰值消耗1点幸运。',
+        '线索不应因一次失败永久中断，可改为带代价地获得。',
+      ],
+      example: '撬锁失败后改为强行破坏锁芯；再次失败可能触发警报并卡死门锁。',
+      keywords: ['孤注一掷', '幸运', '失败', '线索', '调查'],
+    ),
+    RuleReferenceEntry(
+      id: 'coc-sanity',
+      system: RuleReferenceSystem.coc7,
+      category: '理智',
+      title: '理智检定与疯狂',
+      summary: '遭遇超自然恐怖时进行理智检定，并按事件说明失去相应理智值。',
+      points: [
+        '一次失去5点或更多理智时，通常需要进行智力检定判断临时疯狂。',
+        '一天内累计失去当前理智的五分之一，可能进入不定性疯狂。',
+        '疯狂应改变角色的感知和行为，但不应夺走玩家所有决定权。',
+        '重要恐惧、执念和症状应写入长期状态，供后续剧情持续调用。',
+      ],
+      keywords: ['理智', 'SAN', '疯狂', '恐惧', '智力检定'],
+    ),
+    RuleReferenceEntry(
+      id: 'coc-combat',
+      system: RuleReferenceSystem.coc7,
+      category: '战斗',
+      title: '战斗、反击与闪避',
+      summary: '近战通常由攻击者的格斗与目标的反击或闪避进行对抗。',
+      points: [
+        '反击成功可能对攻击者造成伤害；闪避只用于脱离攻击。',
+        '枪械在极近距离、掩体、连续射击等情况下会产生奖励或惩罚。',
+        '受到超过最大生命一半的单次伤害可能造成重伤。',
+        'COC战斗危险且快速，调查和逃生通常比正面对抗更可靠。',
+      ],
+      keywords: ['战斗', '反击', '闪避', '枪械', '重伤'],
+    ),
+    RuleReferenceEntry(
+      id: 'coc-chase',
+      system: RuleReferenceSystem.coc7,
+      category: '追逐',
+      title: '追逐与障碍',
+      summary: '用位置、移动速度与障碍构成追逐，而不是把追逐简化成一次敏捷检定。',
+      points: [
+        '先确定参与者速度、起始距离以及追逐是否成立。',
+        '障碍要求技能检定，失败会损失行动、生命或距离。',
+        '每轮都应描述环境变化，让调查员可以选择捷径、藏匿或制造阻碍。',
+      ],
+      keywords: ['追逐', '移动', '障碍', '逃跑', '速度'],
+    ),
+    RuleReferenceEntry(
+      id: 'quick-session-zero',
+      system: RuleReferenceSystem.quickStart,
+      category: '开团准备',
+      title: '先确定五件事',
+      summary: '世界、人物、当前事件、规则和边界明确后，AI才容易稳定主持。',
+      points: [
+        '一句话世界观：这是怎样的世界，最重要的冲突是什么。',
+        '玩家人物：身份、目标、秘密、关系和擅长的行动。',
+        '正在发生的事件：谁在做什么，失败后会发生什么。',
+        '使用的规则：D20、COC百分骰或自定义规则包。',
+        '内容边界：不希望出现的内容，以及需要淡出的场面。',
+      ],
+      keywords: ['零次团', '世界观', '人物', '事件', '边界'],
+    ),
+    RuleReferenceEntry(
+      id: 'quick-opening',
+      system: RuleReferenceSystem.quickStart,
+      category: '开场',
+      title: '三段式开场说明',
+      summary: '正式游玩前先说明世界观、人物处境和正在发生的事件，再把选择权交给玩家。',
+      points: [
+        '第一段交代时代、地点、超自然或社会规则。',
+        '第二段说明玩家是谁、认识谁、拥有什么资源与麻烦。',
+        '第三段呈现立即发生的事件、可感知线索和迫近后果。',
+        '最后用一个具体问题收束，例如“你先调查房门，还是追向楼梯间？”',
+      ],
+      example: '避免只说“你在旅店里，开始行动”；开场必须给出足够可行动的信息。',
+      keywords: ['开场白', '世界观', '人物介绍', '当前事件'],
+    ),
+    RuleReferenceEntry(
+      id: 'quick-loop',
+      system: RuleReferenceSystem.quickStart,
+      category: '主持流程',
+      title: '稳定的每轮游戏循环',
+      summary: '玩家描述意图，GM判断是否需要检定，骰子决定结果，世界承担后果。',
+      points: [
+        '先确认玩家想达到什么，而不是只解析动作字面。',
+        '只有存在不确定性和有效后果时才要求投骰。',
+        '检定前公开使用的属性、技能、难度和失败风险。',
+        '投骰后忠实执行结果，成功也可以带来代价，失败也应推动剧情。',
+        '更新生命、状态、任务、线索、时间和NPC态度后再进入下一轮。',
+      ],
+      keywords: ['流程', '意图', '检定', '后果', '状态更新'],
+    ),
+    RuleReferenceEntry(
+      id: 'quick-input',
+      system: RuleReferenceSystem.quickStart,
+      category: '玩家输入',
+      title: '让 AI 更容易理解的输入方式',
+      summary: '把行动、目标和愿意承担的风险写在一起，AI回应会更准确。',
+      points: [
+        '行动：“我贴着墙移动到办公室门口，观察里面。”',
+        '目标：“我想确认房间里是否有人，而不是立刻闯入。”',
+        '对白使用引号；角色外指令使用 OOC 标记，避免混入剧情。',
+        '需要规则透明时可直接说：“检定前告诉我技能、难度和失败后果。”',
+      ],
+      keywords: ['输入', '行动', '目标', 'OOC', '对话'],
+    ),
+    RuleReferenceEntry(
+      id: 'quick-safety',
+      system: RuleReferenceSystem.quickStart,
+      category: '稳定性',
+      title: '防止长团失控',
+      summary: '每个场景只推进有限目标，并持续记录已确认事实、未解决线索和角色状态。',
+      points: [
+        '不要让 AI 擅自替玩家决定关键行动或内心。',
+        'NPC只根据自己实际知道的信息行动，避免全知。',
+        '重要事实进入世界书，长期变化进入记忆，数值变化进入结构化状态。',
+        '每个章节结束生成简短回顾，再开始下一章节。',
+      ],
+      keywords: ['长期记忆', '世界书', '信息边界', '回顾', '一致性'],
+    ),
+  ];
+
+  static List<RuleReferenceEntry> search({
+    required RuleReferenceSystem system,
+    String query = '',
+    String? category,
+  }) => entries
+      .where((entry) => entry.system == system)
+      .where((entry) => category == null || entry.category == category)
+      .where((entry) => entry.matches(query))
+      .toList(growable: false);
+
+  static List<String> categoriesFor(RuleReferenceSystem system) => entries
+      .where((entry) => entry.system == system)
+      .map((entry) => entry.category)
+      .toSet()
+      .toList(growable: false);
+}

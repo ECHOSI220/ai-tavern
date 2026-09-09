@@ -1,0 +1,46 @@
+name = "ai-tavern-game-server"
+main = "src/worker.ts"
+compatibility_date = "2026-08-31"
+compatibility_flags = ["nodejs_compat", "web_socket_auto_reply_to_close"]
+workers_dev = true
+
+[vars]
+SERVER_ENV = "development"
+SERVER_VERSION = "1.0.0"
+PROTOCOL_VERSION = "3"
+MAX_MESSAGE_BYTES = "65536"
+RECONNECT_GRACE_SECONDS = "180"
+
+[[durable_objects.bindings]]
+name = "GAME_ROOMS"
+class_name = "GameRoomDurableObject"
+
+[exports.GameRoomDurableObject]
+type = "durable-object"
+storage = "sqlite"
+
+[observability.logs]
+enabled = true
+invocation_logs = false
+
+[env.staging.vars]
+SERVER_ENV = "staging"
+SERVER_VERSION = "1.0.0"
+PROTOCOL_VERSION = "3"
+MAX_MESSAGE_BYTES = "65536"
+RECONNECT_GRACE_SECONDS = "180"
+
+[[env.staging.durable_objects.bindings]]
+name = "GAME_ROOMS"
+class_name = "GameRoomDurableObject"
+
+[env.production.vars]
+SERVER_ENV = "production"
+SERVER_VERSION = "1.0.0"
+PROTOCOL_VERSION = "3"
+MAX_MESSAGE_BYTES = "65536"
+RECONNECT_GRACE_SECONDS = "180"
+
+[[env.production.durable_objects.bindings]]
+name = "GAME_ROOMS"
+class_name = "GameRoomDurableObject"

@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "themeId": "miku_digital_stage",
+  "name": "未来音阶 · Miku 数字舞台",
+  "category": "character_theme",
+  "provenance": {
+    "created": "2026-09-01",
+    "updated": "2026-09-02",
+    "prototype": "ChatGPT Image 2026年9月2日 20_43_42.png",
+    "images": "Built-in imagegen fan-art backgrounds regenerated from the user-approved Miku prototype with pale cyan-white geometry and character cast shadows; not official artwork.",
+    "bg_main": "exec-e1331e2c-f9f3-40bd-bc1d-a68ff18457ff.png",
+    "bg_portrait": "exec-f4484b11-6fb9-4e73-b9a8-249f5bcb5f93.png"
+  },
+  "assets": {
+    "bg_main": {
+      "path": "assets/themes/miku_digital_stage/bg_miku_wide.png",
+      "size": "1672x941",
+      "purpose": "横屏沉浸式 Miku 数字舞台背景",
+      "renderer": "raster",
+      "prompt": "prompts/miku_wide.md"
+    },
+    "bg_chat": {
+      "path": "assets/themes/miku_digital_stage/bg_miku_wide.png",
+      "size": "1672x941",
+      "purpose": "聊天页共享数字舞台背景",
+      "renderer": "raster",
+      "prompt": "prompts/miku_wide.md"
+    },
+    "bg_portrait": {
+      "path": "assets/themes/miku_digital_stage/bg_miku_mobile.png",
+      "size": "941x1672",
+      "purpose": "手机竖屏独立构图",
+      "renderer": "raster",
+      "prompt": "prompts/miku_mobile.md"
+    },
+    "preview": {
+      "path": "assets/themes/miku_digital_stage/bg_miku_mobile.png",
+      "size": "941x1672",
+      "purpose": "皮肤库角色预览",
+      "renderer": "raster"
+    },
+    "panel_texture": { "purpose": "青绿玻璃表面", "renderer": "native" },
+    "border_gold": { "purpose": "青色声轨边框", "renderer": "native" },
+    "button_primary": { "purpose": "主操作声波按钮", "renderer": "native" },
+    "button_secondary": { "purpose": "次操作玻璃按钮", "renderer": "native" },
+    "input_frame": { "purpose": "均衡器输入框", "renderer": "native" },
+    "card_character": { "purpose": "数字舞台角色卡", "renderer": "native" },
+    "card_system": { "purpose": "数字舞台系统卡", "renderer": "native" },
+    "dice_bg": { "purpose": "青绿骰子底盘", "renderer": "native" },
+    "dice_glow": { "purpose": "声波骰子光效", "renderer": "native" },
+    "loading_magic_circle": { "purpose": "均衡器加载环", "renderer": "native" },
+    "transition_glow": { "purpose": "青色页面过渡光", "renderer": "native" },
+    "icon_set": { "purpose": "清晰的主题色线性图标", "renderer": "native" },
+    "digital_stage_ui": {
+      "purpose": "波形、均衡器刻度与青色玻璃切角；图标保持清晰的标准线性轮廓",
+      "renderer": "native",
+      "implementation": "SkinMaterial.digitalStage / VocalSkinMotionPainter"
+    }
+  }
+}

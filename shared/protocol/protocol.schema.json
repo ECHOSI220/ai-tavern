@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-tavern.example/protocol/network-envelope-v3.schema.json",
+  "title": "AI Tavern NetworkEnvelope v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocolVersion",
+    "type",
+    "sequenceNumber",
+    "revision",
+    "payload",
+    "visibility",
+    "recipientPlayerIds"
+  ],
+  "properties": {
+    "protocolVersion": { "const": 3 },
+    "messageId": { "type": ["string", "null"], "format": "uuid" },
+    "commandId": { "type": ["string", "null"], "maxLength": 128 },
+    "roomId": { "type": ["string", "null"], "format": "uuid" },
+    "playerSessionId": { "type": ["string", "null"], "format": "uuid" },
+    "senderPlayerId": { "type": ["string", "null"], "format": "uuid" },
+    "token": { "type": ["string", "null"], "maxLength": 512 },
+    "timestamp": { "type": ["string", "null"], "format": "date-time" },
+    "sequenceNumber": { "type": "integer", "minimum": 0 },
+    "revision": { "type": "integer", "minimum": 0 },
+    "type": {
+      "type": "string",
+      "enum": [
+        "hello", "createRoom", "roomCreated", "joinRoom", "reconnect",
+        "snapshot", "statePatch", "playerJoined", "playerLeft", "playerReady",
+        "selectCharacter", "hostRequested", "hostAccepted", "hostDeclined",
+        "hostChanged", "hostHeartbeat", "gameStarted", "playerAction",
+        "turnStarted", "turnActionConfirm", "turnActionUnconfirm",
+        "turnPlayerStatus", "turnAllConfirmed", "turnResolving", "turnResolved",
+        "turnCancelled", "turnSkipPlayer", "secretAction", "playerChat",
+        "privateMessage", "privateRoll", "revealInformation", "presentationEvent",
+        "gmProcessing", "aiRequest", "aiResponse", "toolCall", "toolResult",
+        "gmMessage", "pauseGame", "resumeGame", "retryAction", "requestSnapshot",
+        "kickPlayer", "error", "ping", "pong", "deviceCapability",
+        "campaignAnnouncement"
+      ]
+    },
+    "payload": { "type": "object" },
+    "visibility": {
+      "type": "string",
+      "enum": ["public", "player", "gm", "selectedPlayers"]
+    },
+    "recipientPlayerIds": {
+      "type": "array",
+      "maxItems": 16,
+      "items": { "type": "string", "format": "uuid" }
+    }
+  }
+}
