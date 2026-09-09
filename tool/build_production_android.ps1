@@ -4,6 +4,11 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
+$asciiProjectRoot = 'D:\AI_Tavern_Project'
+if ($projectRoot -match '[^\x00-\x7F]' -and
+    (Test-Path -LiteralPath (Join-Path $asciiProjectRoot 'pubspec.yaml'))) {
+  $projectRoot = $asciiProjectRoot
+}
 $configPath = Join-Path $projectRoot 'server\.env.production.local'
 
 if (-not (Test-Path -LiteralPath $configPath)) {
@@ -39,10 +44,10 @@ $flutterCommand = Get-Command flutter -ErrorAction SilentlyContinue
 $flutterExecutable = if ($flutterCommand) {
   $flutterCommand.Source
 } else {
-  'flutter'
+  'D:\AI_Tavern_Tools\flutter\bin\flutter.bat'
 }
-if (-not $flutterCommand) {
-  throw 'Flutter was not found on PATH. Install Flutter and add its bin directory to PATH.'
+if (-not (Test-Path -LiteralPath $flutterExecutable)) {
+  throw 'Flutter was not found on PATH or in D:\AI_Tavern_Tools\flutter.'
 }
 
 $flutterArgs = @(

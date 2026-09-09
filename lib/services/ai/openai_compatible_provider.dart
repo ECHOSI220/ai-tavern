@@ -6,10 +6,11 @@ import 'package:http/http.dart' as http;
 import '../../models/api_profile.dart';
 import '../../utils/app_logger.dart';
 import 'ai_provider.dart';
+import 'platform_proxy_client.dart';
 
 class OpenAICompatibleProvider implements AiProvider {
   OpenAICompatibleProvider({http.Client? client})
-    : _client = client ?? http.Client();
+    : _client = client ?? createPlatformProxyClient();
 
   final http.Client _client;
   var _cancelled = false;
@@ -31,22 +32,41 @@ class OpenAICompatibleProvider implements AiProvider {
         'stream': false,
         if (tools.isNotEmpty) ...{'tools': tools, 'tool_choice': 'auto'},
       });
+    final watch = Stopwatch()..start();
+    final timeout = Duration(
+      seconds: profile.timeoutSeconds <= 0 ? 120 : profile.timeoutSeconds,
+    );
+    AppLogger.info('ai.tools.start');
     try {
-      final pending = _client.send(request);
-      final response = profile.timeoutSeconds <= 0
-          ? await pending
-          : await pending.timeout(Duration(seconds: profile.timeoutSeconds));
-      final body = await response.stream.bytesToString();
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw _httpException(response.statusCode, body);
-      }
-      final decoded = _decodeObject(body);
-      return OpenAIChatResponse.fromJson(decoded);
+      return await (() async {
+        final response = await _client.send(request);
+        AppLogger.info(
+          'ai.tools.headers',
+          fields: {
+            'status': response.statusCode,
+            'elapsedMs': watch.elapsedMilliseconds,
+          },
+        );
+        final body = await response.stream.bytesToString();
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+          throw _httpException(response.statusCode, body);
+        }
+        return OpenAIChatResponse.fromJson(_decodeObject(body));
+      })().timeout(timeout);
     } on TimeoutException {
-      throw const AiException('连接超时，请检查 API 地址或网络');
+      throw const AiException('模型完整回复超时，行动已保留，请重试结算。', code: 'AI_TIMEOUT');
     } on http.ClientException catch (error) {
-      throw AiException('网络请求失败：${error.message}');
+      final dns = error.message.contains('Failed host lookup');
+      throw AiException(
+        dns ? 'DNS 无法解析模型地址，请检查当前网络或系统代理。' : '模型连接中断，请检查网络或系统代理。',
+        code: dns ? 'AI_DNS_FAILED' : 'AI_NETWORK_FAILED',
+      );
     } finally {
+      watch.stop();
+      AppLogger.info(
+        'ai.tools.complete',
+        fields: {'elapsedMs': watch.elapsedMilliseconds},
+      );
       _client.close();
     }
   }
@@ -408,6 +428,7 @@ class OpenAIChatResponse {
     this.inputTokens = 0,
     this.outputTokens = 0,
     this.usedReasoningFallback = false,
+    this.reasoningContent,
   });
   final String content;
   final List<OpenAIToolCall> toolCalls;
@@ -417,6 +438,7 @@ class OpenAIChatResponse {
   /// recovered from a reasoning/thinking field. Callers that display text to
   /// users must repair or reject it instead of exposing internal analysis.
   final bool usedReasoningFallback;
+  final String? reasoningContent;
 
   Map<String, Object?> toJson() => {
     'content': content,
@@ -424,6 +446,7 @@ class OpenAIChatResponse {
     'inputTokens': inputTokens,
     'outputTokens': outputTokens,
     'usedReasoningFallback': usedReasoningFallback,
+    if (reasoningContent != null) 'reasoningContent': reasoningContent,
   };
 
   factory OpenAIChatResponse.fromTransportJson(Map<String, Object?> json) =>
@@ -438,6 +461,7 @@ class OpenAIChatResponse {
         inputTokens: (json['inputTokens'] as num?)?.toInt() ?? 0,
         outputTokens: (json['outputTokens'] as num?)?.toInt() ?? 0,
         usedReasoningFallback: json['usedReasoningFallback'] == true,
+        reasoningContent: json['reasoningContent'] as String?,
       );
 
   factory OpenAIChatResponse.fromJson(Map<String, Object?> json) {
@@ -459,7 +483,7 @@ class OpenAIChatResponse {
           message['reasoning'] ??
           message['reasoning_text'],
     );
-    final content = standardContent.isNotEmpty
+    final content = standardContent.isNotEmpty || calls.isNotEmpty
         ? standardContent
         : reasoningContent;
     final usage = json['usage'] is Map
@@ -477,7 +501,12 @@ class OpenAIChatResponse {
           (usage['output_tokens'] as num?)?.toInt() ??
           0,
       usedReasoningFallback:
-          standardContent.isEmpty && reasoningContent.isNotEmpty,
+          calls.isEmpty &&
+          standardContent.isEmpty &&
+          reasoningContent.isNotEmpty,
+      reasoningContent: message['reasoning_content'] is String
+          ? message['reasoning_content'] as String
+          : null,
     );
   }
 

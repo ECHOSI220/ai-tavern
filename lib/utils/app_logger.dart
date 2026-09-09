@@ -1,9 +1,16 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:io';
 
 /// 只记录运行状态和短元数据，不记录 API Key、Prompt 或完整聊天正文。
 abstract final class AppLogger {
   static bool _debugEnabled = false;
+  static File? _diagnosticFile;
+  static Future<void> _pendingWrite = Future<void>.value();
+
+  static void setDiagnosticDirectory(String path) {
+    _diagnosticFile = File('$path${Platform.pathSeparator}diagnostics.log');
+  }
 
   static bool get debugEnabled => _debugEnabled;
 
@@ -49,6 +56,22 @@ abstract final class AppLogger {
       if (fields.isNotEmpty) 'fields': _sanitize(fields),
     };
     final message = jsonEncode(record);
+    final file = _diagnosticFile;
+    if (file != null &&
+        (event.startsWith('ai.tools.') ||
+            event.startsWith('multiplayer.ai.'))) {
+      _pendingWrite = _pendingWrite
+          .then((_) async {
+            if (await file.exists() && await file.length() > 1048576) {
+              await file.rename('${file.path}.previous');
+            }
+            await file.writeAsString(
+              '${DateTime.now().toUtc().toIso8601String()} $message\n',
+              mode: FileMode.append,
+            );
+          })
+          .catchError((Object _) {});
+    }
     developer.log(
       message,
       name: 'ai_tavern',

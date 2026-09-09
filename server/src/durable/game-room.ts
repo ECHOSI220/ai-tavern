@@ -61,6 +61,7 @@ export class GameRoomDurableObject extends DurableObject<Env> {
       }
     });
     const alarms: number[] = [];
+    if (this.engine.aiDeadline !== undefined) alarms.push(this.engine.aiDeadline);
     if (this.engine.state.aiHost.status === 'active' && this.engine.state.status !== 'closed') {
       const heartbeat = Date.parse(this.engine.state.aiHost.heartbeatAt ?? '');
       alarms.push((Number.isFinite(heartbeat) ? heartbeat : Date.now()) + 60_000);
@@ -78,11 +79,13 @@ export class GameRoomDurableObject extends DurableObject<Env> {
     await this.serial(async () => {
       try {
         const engine = await this.load();
+        const aiExpired = engine.expireAIRequest();
         const hostExpired = engine.expireHost();
         const countdown = engine.finalizeTurnCountdown();
         await this.save();
         for (const event of countdown.events) this.broadcast(event);
-        if (hostExpired || countdown.changed) this.sendStatePatches(countdown.changed);
+        for (const event of aiExpired.events) this.broadcast(event);
+        if (hostExpired || countdown.changed || aiExpired.changed) this.sendStatePatches(countdown.changed || aiExpired.changed);
       } catch (error) {
         this.engine = undefined;
         throw error;

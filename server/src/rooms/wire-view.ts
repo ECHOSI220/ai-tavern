@@ -15,7 +15,7 @@ export function hostView(state: RoomState): Record<string, unknown> {
   return {
     mode: 'selectedPlayer', providerPlayerId: host.providerPlayerId ?? null,
     providerType: host.providerType ?? 'openai-compatible', modelId: host.modelId ?? null,
-    status: host.status === 'active' ? (host.requestId ? 'busy' : 'ready')
+    status: host.status === 'active' ? (host.lastError ? 'error' : host.requestId ? 'busy' : 'ready')
       : host.status === 'offered' ? 'pending' : host.status === 'unavailable' ? 'offline' : 'none',
     lastHeartbeat: host.heartbeatAt ?? null,
   };

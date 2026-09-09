@@ -5,6 +5,8 @@ import 'dart:async';
 import '../../models/api_profile.dart';
 import '../../models/multiplayer_models.dart';
 import '../ai_service.dart';
+import '../ai/ai_provider.dart';
+import '../../utils/app_logger.dart';
 import '../../repositories/api_repository.dart';
 import 'multiplayer_transport.dart';
 
@@ -20,9 +22,17 @@ class ClientAIHostService {
   ApiProfile? _profile;
   StreamSubscription<MultiplayerEnvelope>? _subscription;
   Timer? _heartbeat;
+  String? _activeRequestId;
+  final Set<String> _finishedRequests = {};
+  int _generation = 0;
+  bool _disposed = false;
   int requests = 0, errors = 0;
 
   Future<void> activate(ApiProfile profile) async {
+    _generation++;
+    aiService.cancel();
+    _activeRequestId = null;
+    _disposed = false;
     _profile = profile;
     await _subscription?.cancel();
     _subscription = client.events.listen(_handleEvent);
@@ -59,10 +69,22 @@ class ClientAIHostService {
   }
 
   Future<void> _handleEvent(MultiplayerEnvelope event) async {
-    if (event.type != MultiplayerEventType.aiRequest || _profile == null)
+    if (_disposed ||
+        event.type != MultiplayerEventType.aiRequest ||
+        _profile == null)
       return;
     final requestId = event.payload['requestId'] as String?;
-    if (requestId == null) return;
+    if (requestId == null ||
+        requestId == _activeRequestId ||
+        _finishedRequests.contains(requestId))
+      return;
+    final generation = ++_generation;
+    aiService.cancel();
+    _activeRequestId = requestId;
+    final profile = _profile!;
+    bool current() => !_disposed && generation == _generation;
+    final watch = Stopwatch()..start();
+    AppLogger.info('multiplayer.ai.start', fields: {'requestId': requestId});
     try {
       final messages = (event.payload['messages'] as List? ?? const [])
           .whereType<Map>()
@@ -72,13 +94,22 @@ class ClientAIHostService {
           .whereType<Map>()
           .map((item) => item.cast<String, Object?>())
           .toList();
-      final apiKey = await apiRepository.readApiKey(_profile!.id);
+      final apiKey = await apiRepository
+          .readApiKey(profile.id)
+          .timeout(const Duration(seconds: 10));
+      if (!current()) return;
       final response = await aiService.completeWithTools(
-        profile: _profile!.copyWith(stream: false),
+        profile: profile.copyWith(
+          stream: false,
+          timeoutSeconds: profile.timeoutSeconds <= 0
+              ? 120
+              : profile.timeoutSeconds.clamp(15, 120),
+        ),
         apiKey: apiKey,
         messages: messages,
         tools: tools,
       );
+      if (!current()) return;
       requests++;
       await client.sendAIResponse(
         requestId: requestId,
@@ -86,18 +117,55 @@ class ClientAIHostService {
         inputTokens: response.inputTokens,
         outputTokens: response.outputTokens,
       );
-    } catch (_) {
+    } catch (error) {
+      if (!current()) return;
       errors++;
-      await client.command(MultiplayerEventType.aiResponse, {
-        'requestId': requestId,
-        // Provider exceptions can contain URLs, headers or key fragments.
-        // The relay needs a status, never local provider diagnostics.
-        'error': 'AI_PROVIDER_FAILED',
-      });
+      final code =
+          error is TimeoutException ||
+              (error is AiException && error.code == 'AI_TIMEOUT')
+          ? 'AI_TIMEOUT'
+          : error is AiException &&
+                const {
+                  'AI_DNS_FAILED',
+                  'AI_NETWORK_FAILED',
+                }.contains(error.code)
+          ? error.code!
+          : 'AI_PROVIDER_FAILED';
+      AppLogger.info(
+        'multiplayer.ai.failed',
+        fields: {
+          'requestId': requestId,
+          'code': code,
+          'stage': error is AiException ? 'provider' : 'client_or_transport',
+          'errorType': error.runtimeType.toString(),
+          if (error is AiException) 'httpStatus': error.statusCode,
+          'elapsedMs': watch.elapsedMilliseconds,
+        },
+      );
+      try {
+        await client.command(MultiplayerEventType.aiResponse, {
+          'requestId': requestId,
+          // Provider exceptions can contain URLs, headers or key fragments.
+          // The relay needs a status, never local provider diagnostics.
+          'error': code,
+        });
+      } catch (_) {
+        /* The server deadline also recovers disconnected hosts. */
+      }
+    } finally {
+      if (current()) {
+        _activeRequestId = null;
+        _finishedRequests.add(requestId);
+        if (_finishedRequests.length > 64)
+          _finishedRequests.remove(_finishedRequests.first);
+      }
     }
   }
 
   Future<void> dispose() async {
+    _disposed = true;
+    _generation++;
+    aiService.cancel();
     _heartbeat?.cancel();
     await _subscription?.cancel();
   }

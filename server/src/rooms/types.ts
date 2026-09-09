@@ -58,6 +58,9 @@ export interface AIHostState {
   messages?: Record<string, unknown>[];
   toolRounds?: number;
   heartbeatAt?: string;
+  requestStartedAt?: string;
+  settlementStartedAt?: string;
+  lastError?: string;
 }
 
 export interface RoomState {

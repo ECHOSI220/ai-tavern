@@ -8,10 +8,11 @@ class AiTestResult {
 }
 
 class AiException implements Exception {
-  const AiException(this.message, {this.statusCode});
+  const AiException(this.message, {this.statusCode, this.code});
 
   final String message;
   final int? statusCode;
+  final String? code;
 
   @override
   String toString() => statusCode == null ? message : '$statusCode: $message';

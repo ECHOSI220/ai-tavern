@@ -649,6 +649,14 @@ class MultiplayerAuthoritativeServer {
         if (actor.playerId != room.room.ownerPlayerId &&
             actor.playerId != room.activeAction!.action.playerId)
           throw StateError('无权重试');
+        room.room = room.room.copyWith(
+          status: MultiplayerRoomStatus.playing,
+          gmWaiting: false,
+          aiHostConfig: room.room.aiHostConfig.copyWith(
+            status: AIHostStatus.busy,
+          ),
+        );
+        await _commitRoom(room, MultiplayerEventType.statePatch, const {});
         _sendAIRequest(room);
       case MultiplayerEventType.pauseGame:
         _requireManagement(room, actor, RoomPermission.pause);
@@ -1999,7 +2007,8 @@ class MultiplayerAuthoritativeServer {
       return;
     }
     active.timeout?.cancel();
-    final requestId = '${active.action.actionId}-round-${active.round}';
+    final requestId =
+        '${active.action.actionId}-round-${active.round}-${const Uuid().v4()}';
     active.requestId = requestId;
     _send(
       socket,
@@ -2251,6 +2260,8 @@ class MultiplayerAuthoritativeServer {
     active.messages.add({
       'role': 'assistant',
       'content': response.content,
+      if (response.reasoningContent != null)
+        'reasoning_content': response.reasoningContent,
       'tool_calls': response.toolCalls
           .map((call) => call.toAssistantJson())
           .toList(),

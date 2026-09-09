@@ -1,5 +1,5 @@
 name: ai_tavern
-description: "AI Tavern: a local-first AI role-playing and chat application."
+description: "幻境酒馆：本地优先的 AI 角色扮演聊天应用。"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -19,10 +19,16 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # Keep the user-facing 1.0.1 label while using a monotonically increasing
 # YYYYMMDDNN Android versionCode. Historical ABI builds reached 14006, so a
 # small sequential code caused Android to report newer feature builds as old.
-version: 1.0.36+2026092317
+version: 1.0.39+2026092320
 
 environment:
   sdk: ^3.12.2
+
+hooks:
+  user_defines:
+    sqlite3:
+      source: test-sqlite3
+      directory: file:///D:/AI_Tavern_Tools/sqlite-prebuilt-3.5.1/
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions

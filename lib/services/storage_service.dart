@@ -19,6 +19,7 @@ class StorageService {
     final String path;
     if (databasePath == null) {
       final directory = await getApplicationSupportDirectory();
+      AppLogger.setDiagnosticDirectory(directory.path);
       path = '${directory.path}${Platform.pathSeparator}ai_tavern.db';
     } else {
       path = databasePath;

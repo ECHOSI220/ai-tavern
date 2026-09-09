@@ -63,6 +63,9 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
   Timer? _credentialSave;
   Timer? _draftSave;
   Timer? _countdownTicker;
+  DateTime? _settlementWaitingSince;
+  DateTime? _lastSettlementRetry;
+  String? _waitingTurnId;
   List<ApiProfile> _profiles = const [];
   String? _profileId;
   final _action = TextEditingController();
@@ -76,10 +79,15 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
   bool _exitPromptOpen = false;
 
   Future<void> _copyWebInvite() async {
-    final code=_room.roomCode;
-    if(_isNearby || !RegExp(r'^[A-HJ-NP-Z2-9]{6}$').hasMatch(code))return;
-    await Clipboard.setData(ClipboardData(text:'https://ai-tavern-cloud.pages.dev/join/$code'));
-    if(mounted)ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('网页邀请已复制；网页同步公开房间状态，不公开私聊内容')));
+    final code = _room.roomCode;
+    if (_isNearby || !RegExp(r'^[A-HJ-NP-Z2-9]{6}$').hasMatch(code)) return;
+    await Clipboard.setData(
+      ClipboardData(text: 'https://ai-tavern-cloud.pages.dev/join/$code'),
+    );
+    if (mounted)
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('网页邀请已复制；网页同步公开房间状态，不公开私聊内容')),
+      );
   }
 
   Future<bool> _saveLocal() async {
@@ -98,12 +106,16 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
       };
       raw['updatedAt'] = DateTime.now().toIso8601String();
       await widget.repository.upsert(TRPGSession.fromJson(raw));
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('已保存本地，可在多人首页的本地存档中查看或转为单人')),
-      );
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('已保存本地，可在多人首页的本地存档中查看或转为单人')),
+        );
       return true;
     } catch (error) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('保存失败：$error')));
+      if (mounted)
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('保存失败：$error')));
       return false;
     }
   }
@@ -117,11 +129,22 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
         title: const Text('退出多人跑团？'),
         content: const Text('退出会断开本机连接；如果你正在提供 AI 主持，其他玩家的结算可能暂停。'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('继续游玩')),
-          if (_session != null) TextButton(onPressed: () async {
-            if (await _saveLocal() && context.mounted) Navigator.pop(context, true);
-          }, child: const Text('保存并退出')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('确认退出')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('继续游玩'),
+          ),
+          if (_session != null)
+            TextButton(
+              onPressed: () async {
+                if (await _saveLocal() && context.mounted)
+                  Navigator.pop(context, true);
+              },
+              child: const Text('保存并退出'),
+            ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('确认退出'),
+          ),
         ],
       ),
     );
@@ -132,6 +155,7 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
       if (mounted) Navigator.pop(context);
     });
   }
+
   late final TRPGPresentationService _presentation;
   late final ValueNotifier<List<TRPGPrivateMessage>> _privateMessageListenable;
 
@@ -170,7 +194,7 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
     _hostService = ClientAIHostService(
       client: widget.client,
       apiRepository: widget.apiRepository,
-      aiService: widget.aiService,
+      aiService: AiService(),
     );
     _stateSub = widget.client.states.listen(_onState);
     _eventSub = widget.client.events.listen(_onEvent);
@@ -206,7 +230,20 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
   }
 
   void _syncCountdownTicker() {
-    final shouldTick = _settlementSeconds != null;
+    final busy = _room.aiHostConfig.status == AIHostStatus.busy;
+    if (busy &&
+        (_settlementWaitingSince == null || _waitingTurnId != _turn?.turnId)) {
+      _settlementWaitingSince = DateTime.now();
+      _waitingTurnId = _turn?.turnId;
+    } else if (!busy) {
+      _settlementWaitingSince = null;
+      _waitingTurnId = null;
+    }
+    final shouldTick =
+        _settlementSeconds != null ||
+        busy ||
+        (_lastSettlementRetry != null &&
+            DateTime.now().difference(_lastSettlementRetry!).inSeconds < 5);
     if (!shouldTick) {
       _countdownTicker?.cancel();
       _countdownTicker = null;
@@ -215,6 +252,42 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
     _countdownTicker ??= Timer.periodic(const Duration(milliseconds: 200), (_) {
       if (mounted) setState(() {});
     });
+  }
+
+  Future<void> _retrySettlement() async {
+    if (!_isOwner ||
+        (_lastSettlementRetry != null &&
+            DateTime.now().difference(_lastSettlementRetry!).inSeconds < 5))
+      return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('重新请求本回合结算？'),
+        content: const Text('玩家行动和已完成的规则结果会保留。旧请求的迟到回复将被忽略；新的模型请求可能产生 API 费用。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('继续等待'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('重试结算'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() {
+      _lastSettlementRetry = DateTime.now();
+      _settlementWaitingSince = DateTime.now();
+      _notice = '已请求重新结算，玩家行动保留。';
+    });
+    _syncCountdownTicker();
+    try {
+      await widget.client.retryAction();
+    } catch (_) {
+      if (mounted) setState(() => _notice = '重试请求未能发送，请检查房间连接。');
+    }
   }
 
   void _scheduleDraftSave() {
@@ -263,10 +336,31 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
   Future<void> _loadProfiles() async {
     final profiles = await widget.apiRepository.getAll();
     if (!mounted) return;
+    final matching = profiles
+        .where((profile) => profile.model == _room.aiHostConfig.modelId)
+        .toList();
+    final resumeProfile =
+        _isHost &&
+            matching.length == 1 &&
+            const {
+              AIHostStatus.ready,
+              AIHostStatus.busy,
+              AIHostStatus.error,
+            }.contains(_room.aiHostConfig.status)
+        ? matching.single
+        : null;
     setState(() {
       _profiles = profiles;
-      _profileId = profiles.firstOrNull?.id;
+      _profileId = resumeProfile?.id ?? profiles.firstOrNull?.id;
     });
+    if (resumeProfile != null) {
+      try {
+        await _hostService.activate(resumeProfile);
+        await widget.client.acceptHost(modelId: resumeProfile.model);
+      } catch (_) {
+        if (mounted) setState(() => _notice = '主持连接恢复失败，请重新指定 AI Host。');
+      }
+    }
     if (_room.kind == CampaignRoomKind.persistent) {
       await widget.client.sendDeviceCapability(
         supportsAIHost: profiles.isNotEmpty,
@@ -278,6 +372,7 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
 
   void _onState(MultiplayerSnapshot value) {
     if (!mounted) return;
+    final wasHost = _isHost;
     final priorTurnId = _snapshot.room.currentTurn?.turnId;
     final oldPrivateIds =
         _snapshot.session?.immersionState.privateMessages
@@ -298,6 +393,7 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
     });
     _privateMessageListenable.value =
         value.session?.immersionState.privateMessages ?? const [];
+    if (wasHost && !_isHost) unawaited(_hostService.dispose());
     _syncCountdownTicker();
     if (incoming != null) {
       final sender = _resolvePrivateName(incoming.senderId);
@@ -961,8 +1057,8 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
         if (!didPop) unawaited(_confirmExit());
       },
       child: _room.status == MultiplayerRoomStatus.lobby
-        ? _buildLobby(context)
-        : _buildGame(context),
+          ? _buildLobby(context)
+          : _buildGame(context),
     );
   }
 
@@ -982,7 +1078,12 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
       appBar: AppBar(
         title: Text(_isNearby ? '附近联机 Lobby' : '多人跑团 Lobby'),
         actions: [
-          if(!_isNearby) IconButton(onPressed:_copyWebInvite,tooltip:'复制网页联机邀请',icon:const Icon(Icons.link)),
+          if (!_isNearby)
+            IconButton(
+              onPressed: _copyWebInvite,
+              tooltip: '复制网页联机邀请',
+              icon: const Icon(Icons.link),
+            ),
           IconButton(
             tooltip: '外观与皮肤',
             icon: const Icon(Icons.palette_outlined),
@@ -1204,10 +1305,14 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
           ],
         ),
         actions: [
-          IconButton(onPressed: _saveLocal, tooltip: '保存本地', icon: const Icon(Icons.save_outlined)),
+          IconButton(
+            onPressed: _saveLocal,
+            tooltip: '保存本地',
+            icon: const Icon(Icons.save_outlined),
+          ),
           PopupMenuButton<String>(
             onSelected: (value) {
-              if(value=='webInvite') _copyWebInvite();
+              if (value == 'webInvite') _copyWebInvite();
               if (value == 'clues') _openPanel(TrpgPanelType.clues);
               if (value == 'skin') {
                 unawaited(
@@ -1240,7 +1345,11 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
               if (value == 'roll') unawaited(_showPrivateDice());
             },
             itemBuilder: (_) => [
-              if(!_isNearby) const PopupMenuItem(value:'webInvite',child:Text('复制网页邀请 / 状态同步')),
+              if (!_isNearby)
+                const PopupMenuItem(
+                  value: 'webInvite',
+                  child: Text('复制网页邀请 / 状态同步'),
+                ),
               const PopupMenuItem(value: 'clues', child: Text('线索板')),
               const PopupMenuItem(value: 'skin', child: Text('外观与皮肤')),
               const PopupMenuItem(value: 'map', child: Text('地图')),
@@ -1277,12 +1386,14 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
               ),
             if (paused)
               TrpgInlineNotice(
-                message: '主持连接已暂停，行动仍会保留。可等待重连或更换 AI Host。',
+                message: _room.aiHostConfig.status == AIHostStatus.error
+                    ? '模型回复超时或调用失败，行动已保留。房主可重试结算或更换 AI Host。'
+                    : '主持连接已暂停，行动仍会保留。可等待重连或更换 AI Host。',
                 action: PopupMenuButton<String>(
                   tooltip: '连接操作',
                   onSelected: (value) {
                     if (value == 'host') _pickHost();
-                    if (value == 'retry') widget.client.retryAction();
+                    if (value == 'retry') _retrySettlement();
                   },
                   itemBuilder: (_) => [
                     if (_isOwner)
@@ -1290,7 +1401,8 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
                         value: 'host',
                         child: Text('更换 Host'),
                       ),
-                    const PopupMenuItem(value: 'retry', child: Text('重试连接')),
+                    if (_isOwner)
+                      const PopupMenuItem(value: 'retry', child: Text('重试结算')),
                   ],
                 ),
               ),
@@ -1321,8 +1433,27 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
                       .toList()
                       .reversed
                       .map(_resolutionCard),
+                  if (_notice != null) _noticeCard(),
                   if (processing)
-                    const TrpgInlineNotice(message: '所有玩家行动已锁定，主持人正在统一结算本回合。'),
+                    TrpgInlineNotice(
+                      message:
+                          '正在等待模型回复／执行规则，已等待 ${_settlementWaitingSince == null ? 0 : DateTime.now().difference(_settlementWaitingSince!).inSeconds} 秒。单次请求最多 120 秒；云端整轮结算最多 5 分钟。',
+                      action: _isOwner
+                          ? TextButton(
+                              onPressed:
+                                  _settlementWaitingSince != null &&
+                                      DateTime.now()
+                                              .difference(
+                                                _settlementWaitingSince!,
+                                              )
+                                              .inSeconds >=
+                                          15
+                                  ? _retrySettlement
+                                  : null,
+                              child: const Text('重试结算'),
+                            )
+                          : null,
+                    ),
                 ],
               ),
             ),
