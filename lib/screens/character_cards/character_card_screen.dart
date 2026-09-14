@@ -10,6 +10,7 @@ import '../../repositories/character_card_repository.dart';
 import '../../repositories/settings_repository.dart';
 import '../../services/export_service.dart';
 import '../character_editor/character_editor_screen.dart';
+import '../character_social/add_social_contact.dart';
 
 class CharacterCardScreen extends StatefulWidget {
   const CharacterCardScreen({
@@ -94,11 +95,19 @@ class _CharacterCardScreenState extends State<CharacterCardScreen> {
   }
 
   Future<void> _delete(Character character) async {
+    final referenced = await widget.repository.hasSocialReferences(
+      character.id,
+    );
+    if (!mounted) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('删除角色卡？'),
-        content: Text('只会删除卡片库中的“${character.name}”，不影响已加入存档的角色。'),
+        content: Text(
+          referenced
+              ? '“${character.name}”仍在角色社交中使用。删除原卡时保留当前人格快照、关系与共同记忆。'
+              : '只会删除卡片库中的“${character.name}”，不影响已加入存档的角色。',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -106,13 +115,16 @@ class _CharacterCardScreenState extends State<CharacterCardScreen> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('删除'),
+            child: Text(referenced ? '保留快照并删除原卡' : '删除'),
           ),
         ],
       ),
     );
     if (confirmed != true) return;
-    await widget.repository.delete(character.id);
+    await widget.repository.delete(
+      character.id,
+      preserveSocialSnapshot: referenced,
+    );
     await _load();
   }
 
@@ -232,12 +244,21 @@ class _CharacterCardScreenState extends State<CharacterCardScreen> {
             : PopupMenuButton<String>(
                 onSelected: (action) {
                   if (action == 'edit') _edit(character);
+                  if (action == 'social') {
+                    addSocialContact(
+                      context,
+                      character,
+                      widget.repository,
+                      widget.settingsRepository,
+                    );
+                  }
                   if (action == 'export') _export(character);
                   if (action == 'trpg') _useForTrpg(character);
                   if (action == 'delete') _delete(character);
                 },
                 itemBuilder: (_) => [
                   const PopupMenuItem(value: 'edit', child: Text('编辑角色卡')),
+                  const PopupMenuItem(value: 'social', child: Text('添加到角色社交')),
                   const PopupMenuItem(value: 'export', child: Text('导出 JSON')),
                   if (widget.campaignRepository != null)
                     const PopupMenuItem(value: 'trpg', child: Text('用于跑团')),

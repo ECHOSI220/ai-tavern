@@ -28,6 +28,7 @@ import '../trpg_shared/trpg_presentation_stage.dart';
 import '../trpg_shared/trpg_memory_screen.dart';
 import '../trpg_shared/trpg_play_ui.dart';
 import '../trpg_shared/trpg_player_guide_card.dart';
+import '../trpg_shared/trpg_voice_button.dart';
 import '../trpg_shared/trpg_private_mailbox_screen.dart';
 import '../trpg_shared/dice_panel.dart';
 import '../app_settings/skin_gallery_page.dart';
@@ -1026,62 +1027,70 @@ class _SoloSessionScreenState extends State<SoloSessionScreen>
                 ),
               ),
             ExpansionTile(
-              title: Text('${_session.worldState.location} · HP ${character.hp}/${character.maxHp}', maxLines: 1, overflow: TextOverflow.ellipsis),
-              children: [Container(
-              width: double.infinity,
-              constraints: const BoxConstraints(maxWidth: 1080),
-              child: TrpgSceneSummary(
-                dense: isNarrow,
-                title: _session.worldState.currentScene.title.isEmpty
-                    ? _session.worldState.location
-                    : _session.worldState.currentScene.title,
-                subtitle:
-                    '${_session.worldState.time} · ${_session.worldState.weather}',
-                facts: [
-                  TrpgFact(
-                    Icons.favorite_outline,
-                    'HP ${character.hp}/${character.maxHp}',
-                  ),
-                  TrpgFact(
-                    Icons.health_and_safety_outlined,
-                    character.statusEffects.isEmpty
-                        ? '状态正常'
-                        : character.statusEffects.join('、'),
-                  ),
-                  TrpgFact(
-                    Icons.assignment_outlined,
-                    _session.campaignState.quests
-                            .where(
-                              (quest) => quest.status == QuestStatus.active,
-                            )
-                            .firstOrNull
-                            ?.title ??
-                        '暂无任务',
-                  ),
-                  if (_session.ruleState.combatActive)
-                    TrpgFact(
-                      Icons.sports_martial_arts_outlined,
-                      '战斗 · 第 ${_session.ruleState.round} 回合',
-                      emphasized: true,
-                    ),
-                ],
-                trailing:
-                    _presentation.state.presentationMode ==
-                        PresentationMode.immersive
-                    ? IconButton.filledTonal(
-                        tooltip: showPresentationStage ? '收起演出画面' : '展开演出画面',
-                        onPressed: () => setState(
-                          () => _showPresentationStage = !showPresentationStage,
-                        ),
-                        icon: SkinIcon(
-                          showPresentationStage
-                              ? Icons.expand_less_rounded
-                              : Icons.image_outlined,
-                        ),
-                      )
-                    : null,
+              title: Text(
+                '${_session.worldState.location} · HP ${character.hp}/${character.maxHp}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
+              children: [
+                Container(
+                  width: double.infinity,
+                  constraints: const BoxConstraints(maxWidth: 1080),
+                  child: TrpgSceneSummary(
+                    dense: isNarrow,
+                    title: _session.worldState.currentScene.title.isEmpty
+                        ? _session.worldState.location
+                        : _session.worldState.currentScene.title,
+                    subtitle:
+                        '${_session.worldState.time} · ${_session.worldState.weather}',
+                    facts: [
+                      TrpgFact(
+                        Icons.favorite_outline,
+                        'HP ${character.hp}/${character.maxHp}',
+                      ),
+                      TrpgFact(
+                        Icons.health_and_safety_outlined,
+                        character.statusEffects.isEmpty
+                            ? '状态正常'
+                            : character.statusEffects.join('、'),
+                      ),
+                      TrpgFact(
+                        Icons.assignment_outlined,
+                        _session.campaignState.quests
+                                .where(
+                                  (quest) => quest.status == QuestStatus.active,
+                                )
+                                .firstOrNull
+                                ?.title ??
+                            '暂无任务',
+                      ),
+                      if (_session.ruleState.combatActive)
+                        TrpgFact(
+                          Icons.sports_martial_arts_outlined,
+                          '战斗 · 第 ${_session.ruleState.round} 回合',
+                          emphasized: true,
+                        ),
+                    ],
+                    trailing:
+                        _presentation.state.presentationMode ==
+                            PresentationMode.immersive
+                        ? IconButton.filledTonal(
+                            tooltip: showPresentationStage
+                                ? '收起演出画面'
+                                : '展开演出画面',
+                            onPressed: () => setState(
+                              () => _showPresentationStage =
+                                  !showPresentationStage,
+                            ),
+                            icon: SkinIcon(
+                              showPresentationStage
+                                  ? Icons.expand_less_rounded
+                                  : Icons.image_outlined,
+                            ),
+                          )
+                        : null,
+                  ),
+                ),
               ],
             ),
             Expanded(
@@ -1089,17 +1098,6 @@ class _SoloSessionScreenState extends State<SoloSessionScreen>
                 controller: _scroll,
                 children: _timelineWidgets(character.name),
               ),
-            ),
-            TrpgPlayerGuideCard(
-              session: _session,
-              controller: _input,
-              playerId: _session.players
-                  .where((player) => !player.isAiControlled)
-                  .firstOrNull
-                  ?.playerId,
-              actionEnabled: _composerMode == _SoloComposerMode.action,
-              inputEnabled: !_sending,
-              initiallyExpanded: false,
             ),
             if (_error != null)
               TrpgInlineNotice(
@@ -1113,60 +1111,72 @@ class _SoloSessionScreenState extends State<SoloSessionScreen>
                         label: const Text('重试'),
                       ),
               ),
-            ExpansionTile(
-              title: const Text('资料与工具'),
-              children: [TrpgQuickActions(
-              actions: [
-                TrpgActionSpec(
-                  icon: Icons.lock_outline,
-                  label: '私密频道',
-                  onPressed: _showPrivateChannel,
-                ),
-                TrpgActionSpec(
-                  icon: Icons.casino_outlined,
-                  label: '私骰',
-                  onPressed: _showPrivateDice,
-                ),
-                TrpgActionSpec(
-                  icon: Icons.person_outline,
-                  label: '角色',
-                  onPressed: () => _showPanel('character'),
-                ),
-                TrpgActionSpec(
-                  icon: Icons.backpack_outlined,
-                  label: '背包',
-                  onPressed: () => _showPanel('inventory'),
-                ),
-                TrpgActionSpec(
-                  icon: Icons.assignment_outlined,
-                  label: '任务',
-                  onPressed: () => _showPanel('quests'),
-                ),
-                TrpgActionSpec(
-                  icon: Icons.search,
-                  label: '线索',
-                  onPressed: () => _openImmersion(TrpgPanelType.clues),
-                ),
-                TrpgActionSpec(
-                  icon: Icons.map_outlined,
-                  label: '地图',
-                  onPressed: () => _openImmersion(TrpgPanelType.map),
-                ),
-                TrpgActionSpec(
-                  icon: Icons.casino_outlined,
-                  label: '骰子说明',
-                  onPressed: () => _showPanel('dice'),
-                ),
-                TrpgActionSpec(
-                  icon: Icons.receipt_long_outlined,
-                  label: '日志',
-                  onPressed: () => _showPanel('log'),
-                ),
-              ],
-            ),
-              ],
-            ),
             TrpgComposer(
+              guidePanel: TrpgPlayerGuideCard(
+                session: _session,
+                controller: _input,
+                playerId: _session.players
+                    .where((player) => !player.isAiControlled)
+                    .firstOrNull
+                    ?.playerId,
+                actionEnabled: _composerMode == _SoloComposerMode.action,
+                inputEnabled: !_sending,
+              ),
+              voiceButton: TrpgVoiceButton(
+                controller: _input,
+                settingsRepository: widget.settingsRepository,
+                enabled: !_sending,
+                onStart: () => _speech.stop(),
+              ),
+              toolsPanel: TrpgQuickActions(
+                actions: [
+                  TrpgActionSpec(
+                    icon: Icons.lock_outline,
+                    label: '私密频道',
+                    onPressed: _showPrivateChannel,
+                  ),
+                  TrpgActionSpec(
+                    icon: Icons.casino_outlined,
+                    label: '私骰',
+                    onPressed: _showPrivateDice,
+                  ),
+                  TrpgActionSpec(
+                    icon: Icons.person_outline,
+                    label: '角色',
+                    onPressed: () => _showPanel('character'),
+                  ),
+                  TrpgActionSpec(
+                    icon: Icons.backpack_outlined,
+                    label: '背包',
+                    onPressed: () => _showPanel('inventory'),
+                  ),
+                  TrpgActionSpec(
+                    icon: Icons.assignment_outlined,
+                    label: '任务',
+                    onPressed: () => _showPanel('quests'),
+                  ),
+                  TrpgActionSpec(
+                    icon: Icons.search,
+                    label: '线索',
+                    onPressed: () => _openImmersion(TrpgPanelType.clues),
+                  ),
+                  TrpgActionSpec(
+                    icon: Icons.map_outlined,
+                    label: '地图',
+                    onPressed: () => _openImmersion(TrpgPanelType.map),
+                  ),
+                  TrpgActionSpec(
+                    icon: Icons.casino_outlined,
+                    label: '骰子说明',
+                    onPressed: () => _showPanel('dice'),
+                  ),
+                  TrpgActionSpec(
+                    icon: Icons.receipt_long_outlined,
+                    label: '日志',
+                    onPressed: () => _showPanel('log'),
+                  ),
+                ],
+              ),
               controller: _input,
               hintText: switch (_composerMode) {
                 _SoloComposerMode.action => '描述你的行动、对话或想法…',

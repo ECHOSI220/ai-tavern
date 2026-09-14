@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # Keep the user-facing 1.0.1 label while using a monotonically increasing
 # YYYYMMDDNN Android versionCode. Historical ABI builds reached 14006, so a
 # small sequential code caused Android to report newer feature builds as old.
-version: 1.0.39+2026092320
+version: 1.1.1+2026092323
 
 environment:
   sdk: ^3.12.2

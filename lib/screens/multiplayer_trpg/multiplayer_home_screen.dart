@@ -191,6 +191,7 @@ class _MultiplayerHomeScreenState extends State<MultiplayerHomeScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => MultiplayerLobbyScreen(
+            settingsRepository: widget.settingsRepository,
             repository: widget.repository,
             initialSnapshot: snapshot,
             client: client,
@@ -282,17 +283,41 @@ class _MultiplayerHomeScreenState extends State<MultiplayerHomeScreen> {
           ],
         ),
         actions: [
-          IconButton(tooltip: '本地存档', icon: const Icon(Icons.save_outlined), onPressed: () => Navigator.push<void>(context, MaterialPageRoute(builder: (_) => LocalArchivesScreen(
-            repository: widget.repository,
-            onBackup: (session) async {
-              await _accountService.restore();
-              if (_accountService.tokens == null) throw StateError('请先在多人首页登录，再备份云端');
-              await CloudSaveService(account: _accountService, repository: widget.repository).upload(session);
-            },
-            onPlay: (session) async {
-              await Navigator.push<void>(context, MaterialPageRoute(builder: (_) => SoloSessionScreen(session: session, repository: widget.repository, apiRepository: widget.apiRepository, settingsRepository: widget.settingsRepository, aiService: widget.aiService)));
-            },
-          )))),
+          IconButton(
+            tooltip: '本地存档',
+            icon: const Icon(Icons.save_outlined),
+            onPressed: () => Navigator.push<void>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => LocalArchivesScreen(
+                  repository: widget.repository,
+                  onBackup: (session) async {
+                    await _accountService.restore();
+                    if (_accountService.tokens == null)
+                      throw StateError('请先在多人首页登录，再备份云端');
+                    await CloudSaveService(
+                      account: _accountService,
+                      repository: widget.repository,
+                    ).upload(session);
+                  },
+                  onPlay: (session) async {
+                    await Navigator.push<void>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => SoloSessionScreen(
+                          session: session,
+                          repository: widget.repository,
+                          apiRepository: widget.apiRepository,
+                          settingsRepository: widget.settingsRepository,
+                          aiService: widget.aiService,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
           IconButton(
             tooltip: '规则资料库',
             icon: const SkinIcon(Icons.menu_book_outlined),
@@ -591,6 +616,7 @@ class _MultiplayerHomeScreenState extends State<MultiplayerHomeScreen> {
       context,
       MaterialPageRoute(
         builder: (_) => NearbyMultiplayerScreen(
+          settingsRepository: widget.settingsRepository,
           repository: widget.repository,
           campaigns: _campaigns,
           selectedCampaign: _selectedCampaign,

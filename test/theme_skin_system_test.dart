@@ -694,6 +694,8 @@ void main() {
                                 mode: mode,
                                 icon: switch (mode) {
                                   AppMode.tavern => Icons.forum_outlined,
+                                  AppMode.characterSocial =>
+                                    Icons.contacts_outlined,
                                   AppMode.soloTrpg => Icons.explore_outlined,
                                   AppMode.multiplayerTrpg =>
                                     Icons.groups_outlined,

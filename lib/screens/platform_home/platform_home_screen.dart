@@ -14,8 +14,8 @@ import '../../repositories/settings_repository.dart';
 import '../../repositories/story_card_repository.dart';
 import '../../repositories/trpg_session_repository.dart';
 import '../../services/ai_service.dart';
-import '../../widgets/community_links.dart';
 import '../home/home_screen.dart';
+import '../character_social/character_social_screen.dart';
 import '../app_settings/app_settings_screen.dart';
 import '../multiplayer_trpg/multiplayer_home_screen.dart';
 import '../rule_library/rule_library_screen.dart';
@@ -82,6 +82,14 @@ class _PlatformHomeScreenState extends State<PlatformHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return switch (_mode) {
+      AppMode.characterSocial => CharacterSocialScreen(
+        cards: widget.characterCardRepository,
+        api: widget.apiRepository,
+        settings: widget.settingsRepository,
+        saves: widget.saveRepository,
+        stories: widget.storyCardRepository,
+        onExit: _returnHome,
+      ),
       AppMode.tavern => HomeScreen(
         repository: widget.saveRepository,
         storyCardRepository: widget.storyCardRepository,
@@ -207,12 +215,18 @@ class _ModeSelectionHome extends StatelessWidget {
                     ),
                   ],
                   const SizedBox(height: 28),
-                  const CommunityLinks(),
-                  const SizedBox(height: 16),
                   LayoutBuilder(
                     builder: (context, constraints) {
                       final columns = constraints.maxWidth >= 840 ? 3 : 1;
                       final cards = [
+                        PlatformModeCard(
+                          mode: AppMode.characterSocial,
+                          icon: Icons.contacts_outlined,
+                          description: '角色卡驱动的持续社交生活',
+                          recentTitle: '消息、联系人和朋友圈',
+                          recentDetail: '共同记忆 · 私人社交世界',
+                          onTap: () => onSelect(AppMode.characterSocial),
+                        ),
                         PlatformModeCard(
                           mode: AppMode.tavern,
                           icon: Icons.forum_outlined,

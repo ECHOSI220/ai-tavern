@@ -1,10 +1,10 @@
 {
-  "version": "1.0.39",
-  "publishedAt": "2026-09-10",
-  "notes": "多人结算与模型网络调用修复；Windows 自动读取系统代理，安卓接入系统代理；保留 DeepSeek 工具调用上下文。修复多人 API 后，Windows 与安卓安装包统一存放在百度网盘。 / Multiplayer settlement and model-network fixes; Windows reads the system proxy and Android uses the platform proxy selector. DeepSeek tool-call context is preserved. Windows and Android packages are available from Baidu Netdisk.",
+  "version": "1.1.1",
+  "publishedAt": "2026-09-14",
+  "notes": "2026.9.14 版本：新增角色社交预览功能；修复回复先显示裸文字、等待记忆整理后才切换皮肤气泡的问题，保留输入草稿。此前的紧凑输入区与单人/多人语音入口继续保留。369 项自动测试通过；角色社交尚未完成全部功能及双真机验收。 / September 14, 2026 release: character social-life preview, consistent streaming chat bubbles, background memory extraction and draft preservation. Compact composers and solo/multiplayer voice entry points are retained. All 369 automated tests pass; full social-feature and two-device acceptance remain incomplete.",
   "sourceUrl": "https://github.com/ECHOSI220/ai-tavern/tree/main/community",
   "downloads": [
-    {"platform":"Windows","architecture":"x64","format":"ZIP","url":"https://pan.baidu.com/s/5cdrHai0bnrtYimTjQr9n4Q","instructions":"打开百度网盘链接，选择 Windows ZIP；下载后完整解压，运行 ai_tavern.exe。不要只复制 exe。 / Open the Baidu Netdisk link and choose the Windows ZIP; extract the whole archive and run ai_tavern.exe."},
-    {"platform":"Android","architecture":"arm64-v8a","format":"APK","url":"https://pan.baidu.com/s/5cdrHai0bnrtYimTjQr9n4Q","instructions":"打开百度网盘链接，选择 Android APK；适用于 64 位安卓手机，覆盖安装前建议备份本地存档。 / Open the Baidu Netdisk link and choose the Android APK; for 64-bit Android devices. Back up local saves before upgrading."}
+    {"platform":"Windows","architecture":"x64","format":"ZIP","url":"https://pan.baidu.com/s/52ffw3X-MMLAoWp3TDZNVTg","instructions":"2026.9.14 分享：选择 Windows ZIP；下载后完整解压，运行 ai_tavern.exe。不要只复制 exe。 / September 14 share: choose the Windows ZIP; extract the whole archive and run ai_tavern.exe."},
+    {"platform":"Android","architecture":"arm64-v8a","format":"APK","url":"https://pan.baidu.com/s/52ffw3X-MMLAoWp3TDZNVTg","instructions":"2026.9.14 分享：选择 Android APK；适用于 64 位安卓手机，覆盖安装前请备份本地存档。 / September 14 share: choose the Android APK for 64-bit devices. Back up local saves before upgrading."}
   ]
 }

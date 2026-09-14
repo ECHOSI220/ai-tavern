@@ -4,12 +4,20 @@ AI Tavern is a local-first Flutter application for AI role-playing, character ch
 
 幻境酒馆是一款本地优先的 Flutter AI 角色扮演、角色聊天和单人/多人跑团应用，提供 Windows x64 与 Android arm64 版本。
 
+## v1.1.1 · 2026.9.14 / Latest update
+
+Character social-life preview and streaming bubble fixes; 369 automated tests pass. Memory extraction no longer delays completed replies. / 角色社交预览与流式气泡修复，369 项自动测试通过；记忆整理不再阻挡回复展示。
+
+Full Phase 10 and physical two-device acceptance remain incomplete. / 完整 Phase 10 及双真机验收尚未完成。
+
+See [implementation report](CHARACTER_SOCIAL_LIFE_REPORT.md) and [display fix](SOCIAL_CHAT_DISPLAY_FIX_1.1.1.md).
+
 ## Downloads / 下载
 
 - [Latest release / 最新版本](https://github.com/ECHOSI220/ai-tavern/releases/latest)
 - [Web community / 云端社区](https://ai-tavern-cloud.pages.dev)
 - [My creations / 我的作品](https://ai-tavern-cloud.pages.dev/me/uploads)
-- [Baidu Netdisk downloads / 百度网盘下载](https://pan.baidu.com/s/5cdrHai0bnrtYimTjQr9n4Q)
+- [Baidu Netdisk downloads / 百度网盘下载](https://pan.baidu.com/s/52ffw3X-MMLAoWp3TDZNVTg)
 - [Open-source web client / 开源网页源码](https://github.com/ECHOSI220/ai-tavern/tree/main/community)
 
 For Windows, extract the entire ZIP and run `ai_tavern.exe`; keep its DLLs and `data` directory together. For Android, install the arm64 APK. Back up local saves before upgrading. / Windows 请完整解压 ZIP 后运行 `ai_tavern.exe`，不要拆开 DLL 和 `data` 目录；安卓安装 arm64 APK。升级前请备份本地存档。

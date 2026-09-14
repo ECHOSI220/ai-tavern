@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import '../trpg_shared/trpg_voice_button.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +19,7 @@ import '../../models/trpg_models.dart';
 import '../../models/trpg_gameplay_models.dart';
 import '../../models/trpg_presentation_models.dart';
 import '../../repositories/api_repository.dart';
+import '../../repositories/settings_repository.dart';
 import '../../repositories/trpg_session_repository.dart';
 import '../../services/ai_service.dart';
 import '../../services/trpg/ai_gm_output_guard.dart';
@@ -39,6 +41,7 @@ class MultiplayerLobbyScreen extends StatefulWidget {
     required this.apiRepository,
     required this.aiService,
     required this.repository,
+    required this.settingsRepository,
     this.nearbyHostBridge,
     super.key,
   });
@@ -47,6 +50,7 @@ class MultiplayerLobbyScreen extends StatefulWidget {
   final ApiRepository apiRepository;
   final AiService aiService;
   final TRPGSessionRepository repository;
+  final SettingsRepository settingsRepository;
   final NearbyHostBridge? nearbyHostBridge;
 
   @override
@@ -1457,16 +1461,6 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
                 ],
               ),
             ),
-            if (session != null && _me.role != TRPGPlayerRole.humanGm)
-              TrpgPlayerGuideCard(
-                session: session,
-                controller: _action,
-                playerId: _myId,
-                actionEnabled: !_chatMode,
-                inputEnabled:
-                    composerEnabled && (!isGroupTurn || !_myTurnConfirmed),
-                initiallyExpanded: false,
-              ),
             _mobileGameBar(
               session: session,
               character: myCharacter,
@@ -1475,6 +1469,25 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
             if (_settlementSeconds case final seconds?)
               TrpgInlineNotice(message: '$seconds 秒后由主持人统一结算；点击右侧 × 可撤回并修改行动。'),
             TrpgComposer(
+              onTools: _showMobileToolsSheet,
+              guidePanel: session != null && _me.role != TRPGPlayerRole.humanGm
+                  ? TrpgPlayerGuideCard(
+                      session: session,
+                      controller: _action,
+                      playerId: _myId,
+                      actionEnabled: !_chatMode,
+                      inputEnabled:
+                          composerEnabled &&
+                          (!isGroupTurn || !_myTurnConfirmed),
+                    )
+                  : null,
+              voiceButton: TrpgVoiceButton(
+                controller: _action,
+                settingsRepository: widget.settingsRepository,
+                enabled:
+                    composerEnabled &&
+                    (!isGroupTurn || !_myTurnConfirmed || _chatMode),
+              ),
               controller: _action,
               enabled: composerEnabled,
               sending: processing && !_chatMode,
@@ -1632,13 +1645,6 @@ class _MultiplayerLobbyScreenState extends State<MultiplayerLobbyScreen> {
                 ),
               ),
             ],
-            const VerticalDivider(width: 1, indent: 11, endIndent: 11),
-            IconButton(
-              key: const ValueKey('mobile-tools-button'),
-              tooltip: '资料与工具',
-              onPressed: _showMobileToolsSheet,
-              icon: const Icon(Icons.dashboard_customize_outlined),
-            ),
           ],
         ),
       ),

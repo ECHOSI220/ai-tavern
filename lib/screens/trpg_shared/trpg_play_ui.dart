@@ -577,6 +577,10 @@ class TrpgComposer extends StatelessWidget {
     this.enabled = true,
     this.sending = false,
     this.modeSelector,
+    this.guidePanel,
+    this.toolsPanel,
+    this.onTools,
+    this.voiceButton,
     this.onCancelConfirmation,
     super.key,
   });
@@ -587,6 +591,24 @@ class TrpgComposer extends StatelessWidget {
   final bool enabled;
   final bool sending;
   final Widget? modeSelector;
+  final Widget? guidePanel;
+  final Widget? toolsPanel;
+  final VoidCallback? onTools;
+  final Widget? voiceButton;
+
+  void _openPanel(BuildContext context, Widget panel) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      constraints: BoxConstraints(
+        maxWidth: 720,
+        maxHeight: MediaQuery.sizeOf(context).height * .7,
+      ),
+      builder: (_) => SafeArea(child: SingleChildScrollView(child: panel)),
+    );
+  }
+
   final VoidCallback? onCancelConfirmation;
 
   @override
@@ -664,6 +686,42 @@ class TrpgComposer extends StatelessWidget {
                                 : Icons.close_rounded,
                             color: colors.onPrimary,
                           ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                if (voiceButton != null) voiceButton!,
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        if (toolsPanel != null || onTools != null)
+                          TextButton.icon(
+                            key: const ValueKey('composer-tools'),
+                            onPressed:
+                                onTools ??
+                                () => _openPanel(context, toolsPanel!),
+                            icon: const SkinIcon(
+                              Icons.dashboard_customize_outlined,
+                              size: 18,
+                            ),
+                            label: const Text('资料与工具'),
+                          ),
+                        if (guidePanel != null)
+                          TextButton.icon(
+                            key: const ValueKey('composer-guide'),
+                            onPressed: () => _openPanel(context, guidePanel!),
+                            icon: const SkinIcon(
+                              Icons.explore_outlined,
+                              size: 18,
+                            ),
+                            label: const Text('接下来做什么'),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ],

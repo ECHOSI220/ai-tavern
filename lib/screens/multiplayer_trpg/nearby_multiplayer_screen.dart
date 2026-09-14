@@ -8,6 +8,7 @@ import '../../models/multiplayer_models.dart';
 import '../../models/nearby_models.dart';
 import '../../models/social_models.dart';
 import '../../repositories/api_repository.dart';
+import '../../repositories/settings_repository.dart';
 import '../../repositories/trpg_session_repository.dart';
 import '../../services/ai_service.dart';
 import '../../services/trpg/android_nearby_transport.dart';
@@ -27,6 +28,7 @@ class NearbyMultiplayerScreen extends StatefulWidget {
     required this.apiRepository,
     required this.aiService,
     required this.repository,
+    required this.settingsRepository,
     super.key,
   });
 
@@ -38,6 +40,7 @@ class NearbyMultiplayerScreen extends StatefulWidget {
   final ApiRepository apiRepository;
   final AiService aiService;
   final TRPGSessionRepository repository;
+  final SettingsRepository settingsRepository;
 
   @override
   State<NearbyMultiplayerScreen> createState() =>
@@ -181,6 +184,7 @@ class _NearbyMultiplayerScreenState extends State<NearbyMultiplayerScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => MultiplayerLobbyScreen(
+            settingsRepository: widget.settingsRepository,
             repository: widget.repository,
             initialSnapshot: snapshot,
             client: client,
@@ -294,6 +298,7 @@ class _NearbyMultiplayerScreenState extends State<NearbyMultiplayerScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => MultiplayerLobbyScreen(
+            settingsRepository: widget.settingsRepository,
             initialSnapshot: snapshot,
             repository: widget.repository,
             client: client,

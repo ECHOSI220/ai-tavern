@@ -3,6 +3,52 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  for (final width in [360.0, 1280.0]) {
+    testWidgets('composer panels stay hidden until opened at $width', (
+      tester,
+    ) async {
+      tester.view.physicalSize = Size(width, 720);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final controller = TextEditingController(text: '保留草稿');
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Align(
+              alignment: Alignment.bottomCenter,
+              child: TrpgComposer(
+                controller: controller,
+                hintText: '行动',
+                onSend: () {},
+                voiceButton: IconButton(
+                  tooltip: '语音输入',
+                  onPressed: () {},
+                  icon: const Icon(Icons.mic_none),
+                ),
+                toolsPanel: const Text('工具内容'),
+                guidePanel: const Text('任务内容'),
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(find.text('工具内容'), findsNothing);
+      expect(find.text('任务内容'), findsNothing);
+      expect(find.byTooltip('语音输入'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('composer-tools')));
+      await tester.pumpAndSettle();
+      expect(find.text('工具内容'), findsOneWidget);
+      Navigator.of(tester.element(find.text('工具内容'))).pop();
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('composer-guide')));
+      await tester.pumpAndSettle();
+      expect(find.text('任务内容'), findsOneWidget);
+      expect(controller.text, '保留草稿');
+      expect(tester.takeException(), isNull);
+    });
+  }
   testWidgets('TRPG play controls remain usable on a narrow phone', (
     tester,
   ) async {

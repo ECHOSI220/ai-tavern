@@ -14,6 +14,7 @@ class Character {
     this.exampleDialogue = '',
     this.scenarioNotes = '',
     this.enabled = true,
+    this.socialProfile = const {},
   });
 
   final String id;
@@ -31,6 +32,9 @@ class Character {
   final String scenarioNotes;
   final bool enabled;
 
+  /// Optional behavior extension; never a second copy of the character persona.
+  final Map<String, Object?> socialProfile;
+
   Character copyWith({
     String? id,
     String? name,
@@ -47,6 +51,7 @@ class Character {
     String? exampleDialogue,
     String? scenarioNotes,
     bool? enabled,
+    Map<String, Object?>? socialProfile,
   }) => Character(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -62,6 +67,7 @@ class Character {
     exampleDialogue: exampleDialogue ?? this.exampleDialogue,
     scenarioNotes: scenarioNotes ?? this.scenarioNotes,
     enabled: enabled ?? this.enabled,
+    socialProfile: socialProfile ?? this.socialProfile,
   );
 
   Map<String, Object?> toJson() => {
@@ -79,6 +85,7 @@ class Character {
     'exampleDialogue': exampleDialogue,
     'scenarioNotes': scenarioNotes,
     'enabled': enabled,
+    'socialProfile': socialProfile,
   };
 
   factory Character.fromJson(Map<String, Object?> json) => Character(
@@ -96,5 +103,8 @@ class Character {
     exampleDialogue: json['exampleDialogue'] as String? ?? '',
     scenarioNotes: json['scenarioNotes'] as String? ?? '',
     enabled: json['enabled'] as bool? ?? true,
+    socialProfile: json['socialProfile'] is Map
+        ? (json['socialProfile'] as Map).cast<String, Object?>()
+        : const {},
   );
 }
